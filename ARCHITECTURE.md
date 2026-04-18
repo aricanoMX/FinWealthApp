@@ -54,3 +54,46 @@ Para interactuar con el mundo exterior y garantizar la integridad del código, e
 *   **Estructura Centralizada:** Un único repositorio `.git` en la raíz que engloba `/finwealth-mobile`, `/finwealth-backend` y `/finwealth-infra`.
 *   **Regla de Commits Atómicos:** Cada tarea, mejora, corrección o módulo ejecutado por un agente del Escuadrón Virtual concluye obligatoriamente con un commit atómico aislado.
 *   **Granularidad Estricta:** Un commit = Un propósito único (ej. `feat(backend): add POST /transactions`). Las features, fixes o refactors nunca se mezclan. El Orquestador exige este estándar a todos los sub-agentes.
+
+---
+
+## 5. Contrato Global de Errores (Error Handling)
+
+Para garantizar consistencia y predicción en la UI, el backend NUNCA devolverá excepciones crudas. Toda respuesta de error debe adherirse al siguiente formato estricto:
+
+```json
+{
+  "success": false,
+  "code": "ERR_DOUBLE_ENTRY_VIOLATION", // Código constante y predecible
+  "message": "La suma de débitos y créditos no es igual a cero.", // Mensaje amigable
+  "details": { ... } // (Opcional) Metadata técnica adicional
+}
+```
+El agente `mobile-web-ui` está obligado a interceptar este formato globalmente y mapear los códigos (`code`) a estados de interfaz, evitando "adivinar" el origen del error basándose en los códigos HTTP.
+
+---
+
+## 6. Arquitectura Interna del Backend (NestJS + DDD Simplificado)
+
+Para evitar el acoplamiento y garantizar la escalabilidad, el backend implementará una estructura basada en **Módulos por Dominio**. Queda estrictamente prohibida la "mezcla de capas".
+
+Estructura obligatoria por cada módulo (ej. `src/transactions/`):
+1.  **`controllers/`:** Su única responsabilidad es recibir peticiones HTTP, validar el payload contra DTOs (Data Transfer Objects con `class-validator`) y delegar la ejecución a los Servicios.
+2.  **`services/` (Casos de Uso):** Contienen la lógica de negocio pura (ej. validaciones matemáticas). **No conocen a la base de datos ni a Drizzle ORM.**
+3.  **`repositories/` (Infraestructura):** Encargados exclusivos de la persistencia (consultas a Drizzle/PostgreSQL). Los servicios llaman a los repositorios a través de inyección de dependencias.
+
+---
+
+## 7. Flujo de Autenticación (Supabase JWT)
+
+La autenticación es delegada y sin estado (stateless):
+*   **Frontend (`finwealth-mobile`):** Es responsable de interactuar directamente con el SDK de Supabase para login/registro y de almacenar el JWT de forma segura usando **Expo SecureStore**.
+*   **Backend (`finwealth-backend`):** **NO** emite tokens de sesión ni maneja contraseñas. Actúa como validador. Debe existir un `AuthGuard` global en NestJS que intercepte todas las peticiones, extraiga el Bearer Token, verifique su firma criptográfica (usando la llave de Supabase) y exponga el `user_id` en el objeto `request` para que las consultas al ORM puedan respetar las políticas RLS.
+
+---
+
+## 8. Gestión Estricta de Entorno (.env)
+
+El proyecto asume una postura de "Fallar Rápido" (*Fail-Fast*) ante mala configuración:
+*   **Backend:** Es obligatorio el uso de validación de esquema de variables de entorno (ej. usando `Joi` o `Zod` integrado al `ConfigModule` de NestJS). Si variables críticas como `SUPABASE_URL` o `SUPABASE_KEY` faltan o tienen un formato incorrecto, la aplicación **debe crashear inmediatamente** al arrancar.
+*   **Frontend:** El agente debe asegurar que el uso de variables de entorno en Expo esté tipado y no exponga llaves secretas del backend.
