@@ -13,10 +13,15 @@ export class TransactionsService {
   /**
    * Processes a transaction request, ensuring double-entry constraints.
    */
-  async createTransaction(createDto: CreateTransactionDto): Promise<{ id: string }> {
+  async createTransaction(
+    createDto: CreateTransactionDto,
+  ): Promise<{ id: string }> {
     // 1. Math constraint: ensure balance is zero before DB touch
     this.doubleEntryService.validateTransactionBalance(
-      createDto.entries.map((entry) => ({ amount: entry.amount }))
+      createDto.entries.map((entry) => ({
+        accountId: entry.accountId,
+        amount: entry.amount,
+      })),
     );
 
     // 2. Delegate to repository

@@ -9,7 +9,8 @@ export class TransactionsController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async create(@Body() createTransactionDto: CreateTransactionDto) {
-    const result = await this.transactionsService.createTransaction(createTransactionDto);
+    const result =
+      await this.transactionsService.createTransaction(createTransactionDto);
     return {
       success: true,
       data: result,

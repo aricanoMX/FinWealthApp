@@ -15,9 +15,9 @@ export const DATABASE_CONNECTION = 'DATABASE_CONNECTION';
       useFactory: (configService: ConfigService) => {
         const connectionString = configService.get<string>('SUPABASE_URL');
         if (!connectionString) {
-            throw new Error('Database connection string is required');
+          throw new Error('Database connection string is required');
         }
-        
+
         const client = postgres(connectionString, { prepare: false });
         return drizzle(client, { schema });
       },

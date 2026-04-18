@@ -12,7 +12,7 @@ export type EnvConfig = z.infer<typeof envSchema>;
 /**
  * Validates a configuration object (usually process.env) against our strict schema.
  * Throws an error if invalid, fulfilling the 'Fail-Fast' architecture pillar.
- * 
+ *
  * @param config Record of environment variables (process.env)
  * @returns Validated and typed configuration object
  */

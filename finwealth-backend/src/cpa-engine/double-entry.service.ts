@@ -13,7 +13,9 @@ export class DoubleEntryService {
    */
   validateTransactionBalance(entries: JournalEntryInput[]): boolean {
     if (!entries || entries.length === 0) {
-      throw new DoubleEntryViolationException('Cannot validate balance for an empty transaction.');
+      throw new DoubleEntryViolationException(
+        'Cannot validate balance for an empty transaction.',
+      );
     }
 
     const total = entries.reduce((sum, entry) => {
@@ -21,7 +23,9 @@ export class DoubleEntryService {
     }, new Decimal(0));
 
     if (!total.isZero()) {
-      throw new DoubleEntryViolationException(`The sum of debits and credits is not zero (Difference: ${total.toString()}).`);
+      throw new DoubleEntryViolationException(
+        `The sum of debits and credits is not zero (Difference: ${total.toString()}).`,
+      );
     }
 
     return true; // We can still return true for success, though throwing is the main contract

@@ -14,7 +14,7 @@ describe('GlobalExceptionFilter', () => {
     const mockGetResponse = jest.fn().mockReturnValue({
       status: mockStatus,
     });
-    
+
     const mockHttpArgumentsHost = jest.fn().mockReturnValue({
       getResponse: mockGetResponse,
       getRequest: jest.fn(),
@@ -24,7 +24,10 @@ describe('GlobalExceptionFilter', () => {
       switchToHttp: mockHttpArgumentsHost,
     } as unknown as ArgumentsHost;
 
-    const exception = new HttpException('Resource not found', HttpStatus.NOT_FOUND);
+    const exception = new HttpException(
+      'Resource not found',
+      HttpStatus.NOT_FOUND,
+    );
 
     filter.catch(exception, mockArgumentsHost);
 
@@ -42,7 +45,7 @@ describe('GlobalExceptionFilter', () => {
     const mockGetResponse = jest.fn().mockReturnValue({
       status: mockStatus,
     });
-    
+
     const mockHttpArgumentsHost = jest.fn().mockReturnValue({
       getResponse: mockGetResponse,
       getRequest: jest.fn(),
@@ -57,10 +60,12 @@ describe('GlobalExceptionFilter', () => {
     filter.catch(exception, mockArgumentsHost);
 
     expect(mockStatus).toHaveBeenCalledWith(HttpStatus.INTERNAL_SERVER_ERROR);
-    expect(mockJson).toHaveBeenCalledWith(expect.objectContaining({
-      success: false,
-      code: 'INTERNAL_SERVER_ERROR',
-      message: 'Unexpected catastrophic failure',
-    }));
+    expect(mockJson).toHaveBeenCalledWith(
+      expect.objectContaining({
+        success: false,
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'Unexpected catastrophic failure',
+      }),
+    );
   });
 });

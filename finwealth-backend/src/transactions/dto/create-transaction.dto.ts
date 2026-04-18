@@ -1,4 +1,14 @@
-import { IsString, IsUUID, IsDateString, IsOptional, ValidateNested, ArrayMinSize, IsArray, IsNumberString, IsBoolean } from 'class-validator';
+import {
+  IsString,
+  IsUUID,
+  IsDateString,
+  IsOptional,
+  ValidateNested,
+  ArrayMinSize,
+  IsArray,
+  IsNumberString,
+  IsBoolean,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class CreateJournalEntryDto {
@@ -35,7 +45,10 @@ export class CreateTransactionDto {
   receiptUrl?: string;
 
   @IsArray()
-  @ArrayMinSize(2, { message: 'A transaction must have at least two journal entries for double-entry bookkeeping.' })
+  @ArrayMinSize(2, {
+    message:
+      'A transaction must have at least two journal entries for double-entry bookkeeping.',
+  })
   @ValidateNested({ each: true })
   @Type(() => CreateJournalEntryDto)
   entries: CreateJournalEntryDto[];

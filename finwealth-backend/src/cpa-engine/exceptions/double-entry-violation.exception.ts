@@ -1,7 +1,9 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
 
 export class DoubleEntryViolationException extends HttpException {
-  constructor(message: string = 'The sum of debits and credits must equal exactly 0.') {
+  constructor(
+    message: string = 'The sum of debits and credits must equal exactly 0.',
+  ) {
     super(
       {
         success: false,

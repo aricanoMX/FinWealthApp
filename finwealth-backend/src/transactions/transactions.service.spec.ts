@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/unbound-method */
 import { Test, TestingModule } from '@nestjs/testing';
 import { TransactionsService } from './transactions.service';
 import { TransactionsRepository } from './transactions.repository';
@@ -49,8 +50,8 @@ describe('TransactionsService', () => {
     const result = await service.createTransaction(createDto);
 
     expect(doubleEntryService.validateTransactionBalance).toHaveBeenCalledWith([
-      { amount: '100.00' },
-      { amount: '-100.00' },
+      { accountId: 'acc-1', amount: '100.00' },
+      { accountId: 'acc-2', amount: '-100.00' },
     ]);
     expect(repository.createWithEntries).toHaveBeenCalledWith(createDto);
     expect(result).toEqual({ id: 'transaction-id-123' });
@@ -71,7 +72,9 @@ describe('TransactionsService', () => {
       throw new DoubleEntryViolationException();
     });
 
-    await expect(service.createTransaction(createDto)).rejects.toThrow(DoubleEntryViolationException);
+    await expect(service.createTransaction(createDto)).rejects.toThrow(
+      DoubleEntryViolationException,
+    );
     expect(repository.createWithEntries).not.toHaveBeenCalled();
   });
 });
