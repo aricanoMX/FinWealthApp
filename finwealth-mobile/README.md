@@ -2,25 +2,28 @@
 
 Interfaz de usuario para el ecosistema FinWealth, construida con **Expo** y **React Native**. Enfocada en ofrecer una experiencia fluida, rápida y segura.
 
-## 🚀 Inicio Rápido
+## 🚀 Inicio Rápido (Paso a Paso)
 
-1. **Instalar dependencias:**
-   ```bash
-   npm install
-   ```
+### 1. Instalación de Dependencias
+Instala todas las librerías necesarias con el siguiente comando dentro de esta carpeta:
+```bash
+npm install
+```
 
-2. **Configurar el Backend:**
-   Asegúrate de tener el backend corriendo o define tu URL en las variables de entorno:
-   ```env
-   EXPO_PUBLIC_API_URL=http://localhost:3000
-   EXPO_PUBLIC_SUPABASE_URL=tu_url_de_supabase
-   EXPO_PUBLIC_SUPABASE_ANON_KEY=tu_clave_anonima_de_supabase
-   ```
+### 2. Configurar el Backend (.env)
+Asegúrate de tener el backend corriendo o define tu URL en un archivo `.env` dentro de esta carpeta:
+```env
+EXPO_PUBLIC_API_URL=http://localhost:3000
+EXPO_PUBLIC_SUPABASE_URL=tu_url_de_supabase
+EXPO_PUBLIC_SUPABASE_ANON_KEY=tu_clave_anonima_de_supabase
+```
 
-3. **Iniciar Expo Go:**
-   ```bash
-   npm run start
-   ```
+### 3. Ejecución
+*   **Modo Individual:** Para iniciar solo Expo Go: `npm run start`
+*   **Modo Simultáneo (Recomendado):** Para correr todo el ecosistema (Backend + Mobile) al mismo tiempo, ve a la **raíz del proyecto** y ejecuta:
+    ```bash
+    npm run dev
+    ```
 
 ## 🛠️ Estándares y TDD
 

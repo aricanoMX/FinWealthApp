@@ -9,10 +9,26 @@ Este repositorio contiene la definición del esquema de base de datos de FinWeal
 3.  **Accounts:** Cuentas financieras (Activos, Pasivos, etc.).
 4.  **Transactions & Journal Entries:** Corazón de la contabilidad por partida doble.
 
-## 🚀 Uso de Drizzle Kit
+## 🚀 Inicio Rápido (Paso a Paso)
 
-*   **Generar Migración:** `npx drizzle-kit generate`
-*   **Sincronizar (Push):** `npx drizzle-kit push` (Usa con precaución en producción).
+### 1. Instalación de Dependencias
+Instala las herramientas de Drizzle ejecutando el siguiente comando dentro de esta carpeta:
+```bash
+npm install
+```
+
+### 2. Configuración de Entorno (.env)
+Crea un archivo `.env` dentro de esta carpeta con la URL de tu base de datos:
+```env
+SUPABASE_URL=tu_url_de_conexión_a_supabase
+```
+
+### 3. Ejecución
+*   **Modo Individual (Drizzle):** Generar migraciones con `npx drizzle-kit generate`.
+*   **Modo Simultáneo (App Completa):** Para correr el ecosistema completo (Backend + Mobile) desde la **raíz del proyecto**:
+    ```bash
+    npm run dev
+    ```
 
 ## 🛠️ Configuración Local
 
