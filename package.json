@@ -1,0 +1,12 @@
+{
+  "name": "finwealth-app-root",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"npm run start:dev --prefix finwealth-backend\" \"npm run start --prefix finwealth-mobile\"",
+    "test:all": "concurrently \"npm run test --prefix finwealth-backend\" \"npm run test --prefix finwealth-mobile\"",
+    "lint:all": "concurrently \"npm run lint --prefix finwealth-backend\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}

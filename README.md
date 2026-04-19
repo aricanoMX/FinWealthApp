@@ -8,7 +8,23 @@ Este repositorio sigue una estructura de monorepo lógico que contiene tres proy
 
 *   📱 **[`/finwealth-mobile`](./finwealth-mobile/README.md)**: Frontend en React Native (Expo). Estado global manejado vía Zustand. Animaciones fluidas a 60FPS vía Reanimated 3.
 *   ⚙️ **[`/finwealth-backend`](./finwealth-backend/README.md)**: Backend en NestJS. Controladores REST para la ingesta de datos ("Tentáculos") y el Motor Financiero central.
-*   🗄️ **[`/finwealth-infra`](./finwealth-infra/package.json)**: Repositorio central de infraestructura que contiene el esquema de base de datos en Drizzle ORM y las políticas RLS (Row-Level Security) de Supabase.
+*   🗄️ **[`/finwealth-infra`](./finwealth-infra/README.md)**: Repositorio central de infraestructura que contiene el esquema de base de datos en Drizzle ORM y las políticas RLS (Row-Level Security) de Supabase.
+
+---
+
+## 🚀 Inicio Rápido (Ejecución Simultánea)
+
+Para iniciar todos los servicios del ecosistema localmente con un solo comando:
+
+1.  **Instalar dependencias en la raíz:** `npm install`
+2.  **Configurar Variables de Env:** Asegúrate de tener los archivos `.env` configurados en `/finwealth-backend` y `/finwealth-mobile` según sus respectivos READMEs.
+3.  **Ejecutar todo en paralelo:**
+    ```bash
+    npm run dev
+    ```
+    *Este comando iniciará el backend en el puerto 3000 y el servidor de Expo de manera simultánea.*
+
+---
 
 ## 📚 Documentación Core (La "Biblia")
 
