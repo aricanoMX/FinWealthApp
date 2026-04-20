@@ -34,12 +34,16 @@ describe('TransactionsController', () => {
         description: 'Test transaction',
         entries: [],
       };
+      const user = { userId: 'user-123', email: 'test@test.com' };
 
       service.createTransaction.mockResolvedValue({ id: 'trans-id-123' });
 
-      const result = await controller.create(createDto);
+      const result = await controller.create(createDto, user);
 
-      expect(service.createTransaction).toHaveBeenCalledWith(createDto);
+      expect(service.createTransaction).toHaveBeenCalledWith(
+        createDto,
+        user.userId,
+      );
       expect(result).toEqual({
         success: true,
         data: { id: 'trans-id-123' },

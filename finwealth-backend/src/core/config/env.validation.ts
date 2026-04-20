@@ -5,6 +5,7 @@ export const envSchema = z.object({
   PORT: z.coerce.number().default(3000), // Default to 3000, parse strings to numbers
   SUPABASE_URL: z.string().url(),
   SUPABASE_KEY: z.string().min(1),
+  SUPABASE_JWT_SECRET: z.string().min(1),
 });
 
 export type EnvConfig = z.infer<typeof envSchema>;

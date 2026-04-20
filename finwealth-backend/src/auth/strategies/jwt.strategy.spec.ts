@@ -1,0 +1,34 @@
+import { ConfigService } from '@nestjs/config';
+import { Test, TestingModule } from '@nestjs/testing';
+import { JwtStrategy } from './jwt.strategy';
+
+describe('JwtStrategy', () => {
+  let strategy: JwtStrategy;
+
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        JwtStrategy,
+        {
+          provide: ConfigService,
+          useValue: {
+            get: jest.fn().mockReturnValue('test-secret'),
+            getOrThrow: jest.fn().mockReturnValue('test-secret'),
+          },
+        },
+      ],
+    }).compile();
+
+    strategy = module.get<JwtStrategy>(JwtStrategy);
+  });
+
+  it('should be defined', () => {
+    expect(strategy).toBeDefined();
+  });
+
+  it('should validate and return user payload', () => {
+    const payload = { sub: 'user-123', email: 'test@example.com' };
+    const result = strategy.validate(payload);
+    expect(result).toEqual({ userId: 'user-123', email: 'test@example.com' });
+  });
+});

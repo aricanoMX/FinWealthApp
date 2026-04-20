@@ -47,7 +47,7 @@ describe('TransactionsService', () => {
     doubleEntryService.validateTransactionBalance.mockReturnValue(true);
     repository.createWithEntries.mockResolvedValue('transaction-id-123');
 
-    const result = await service.createTransaction(createDto);
+    const result = await service.createTransaction(createDto, 'user-123');
 
     expect(doubleEntryService.validateTransactionBalance).toHaveBeenCalledWith([
       { accountId: 'acc-1', amount: '100.00' },
@@ -72,9 +72,9 @@ describe('TransactionsService', () => {
       throw new DoubleEntryViolationException();
     });
 
-    await expect(service.createTransaction(createDto)).rejects.toThrow(
-      DoubleEntryViolationException,
-    );
+    await expect(
+      service.createTransaction(createDto, 'user-123'),
+    ).rejects.toThrow(DoubleEntryViolationException);
     expect(repository.createWithEntries).not.toHaveBeenCalled();
   });
 });

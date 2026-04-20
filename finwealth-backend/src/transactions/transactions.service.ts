@@ -15,6 +15,7 @@ export class TransactionsService {
    */
   async createTransaction(
     createDto: CreateTransactionDto,
+    _userId: string,
   ): Promise<{ id: string }> {
     // 1. Math constraint: ensure balance is zero before DB touch
     this.doubleEntryService.validateTransactionBalance(
@@ -24,7 +25,10 @@ export class TransactionsService {
       })),
     );
 
-    // 2. Delegate to repository
+    // 2. Acknowledge userId for future ledger validation
+    void _userId;
+
+    // 3. Delegate to repository
     const id = await this.repository.createWithEntries(createDto);
 
     return { id };
