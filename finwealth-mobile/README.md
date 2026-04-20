@@ -4,26 +4,34 @@ Interfaz de usuario para el ecosistema FinWealth, construida con **Expo** y **Re
 
 ## 🚀 Inicio Rápido (Paso a Paso)
 
-### 1. Instalación de Dependencias
-Instala todas las librerías necesarias con el siguiente comando dentro de esta carpeta:
+### Paso 1: El Secreto de las Variables de Entorno (⚠️ CRÍTICO)
+Crea un archivo `.env` en la raíz de `finwealth-mobile`. 
+**Advertencia:** Si vas a probar la app en tu celular físico, `localhost` NO funcionará porque tu celular buscará en sí mismo, no en tu PC. Debes usar la **dirección IP de tu computadora** en tu red local (ej. 192.168.1.XX).
+
+```env
+# Reemplaza con la IP de tu computadora en tu red WiFi
+EXPO_PUBLIC_API_URL=http://192.168.1.75:3000
+# Credenciales de tu proyecto de Supabase (Project Settings > API)
+EXPO_PUBLIC_SUPABASE_URL=tu_url_de_api_supabase
+EXPO_PUBLIC_SUPABASE_ANON_KEY=tu_clave_anonima_de_supabase
+```
+
+### Paso 2: Instalación de Dependencias
+Si no lo hiciste en la raíz, instala las librerías aquí:
 ```bash
 npm install
 ```
 
-### 2. Configurar el Backend (.env)
-Asegúrate de tener el backend corriendo o define tu URL en un archivo `.env` dentro de esta carpeta:
-```env
-EXPO_PUBLIC_API_URL=http://localhost:3000
-EXPO_PUBLIC_SUPABASE_URL=tu_url_de_supabase
-EXPO_PUBLIC_SUPABASE_ANON_KEY=tu_clave_anonima_de_supabase
+### Paso 3: Arrancar Expo
+Inicia el servidor empaquetador de Metro/Expo:
+```bash
+npx expo start
 ```
 
-### 3. Ejecución
-*   **Modo Individual:** Para iniciar solo Expo Go: `npm run start`
-*   **Modo Simultáneo (Recomendado):** Para correr todo el ecosistema (Backend + Mobile) al mismo tiempo, ve a la **raíz del proyecto** y ejecuta:
-    ```bash
-    npm run dev
-    ```
+### Paso 4: Abrir la App en tu Dispositivo
+Una vez que veas el código QR en la terminal:
+*   **iOS:** Abre la cámara nativa de tu iPhone, apunta al QR y toca el enlace emergente de Expo Go.
+*   **Android:** Abre la aplicación **Expo Go**, selecciona "Scan QR Code" y apunta a tu pantalla.
 
 ## 🛠️ Estándares y TDD
 

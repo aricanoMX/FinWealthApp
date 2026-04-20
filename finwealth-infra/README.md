@@ -11,26 +11,30 @@ Este repositorio contiene la definición del esquema de base de datos de FinWeal
 
 ## 🚀 Inicio Rápido (Paso a Paso)
 
-### 1. Instalación de Dependencias
-Instala las herramientas de Drizzle ejecutando el siguiente comando dentro de esta carpeta:
+### Paso 1: Configurar el Connection String (.env)
+Crea un archivo `.env` en la raíz de la carpeta `finwealth-infra`.
+**Importante:** El `SUPABASE_URL` no es la URL HTTP de la API, sino la cadena de conexión de **PostgreSQL (Transaction pooler)**. Debes incluir tu contraseña:
+```env
+# Ejemplo: postgresql://postgres.[tu-ref]:[tu-password]@aws-0-us-east-1.pooler.supabase.com:6543/postgres
+SUPABASE_URL=tu_cadena_de_conexion_postgresql
+```
+
+### Paso 2: Instalación de Dependencias
+Si no instalaste desde la raíz, instala las herramientas de Drizzle aquí:
 ```bash
 npm install
 ```
 
-### 2. Configuración de Entorno (.env)
-Crea un archivo `.env` dentro de esta carpeta con la URL de tu base de datos:
-```env
-SUPABASE_URL=tu_url_de_conexión_a_supabase
+### Paso 3: Sincronizar el Esquema con Supabase
+Para construir las tablas y políticas en tu base de datos vacía, ejecuta:
+```bash
+npm run generate
+npx drizzle-kit push
 ```
 
-### 3. Ejecución
-*   **Modo Individual (Drizzle):** Generar migraciones con `npx drizzle-kit generate`.
-*   **Modo Simultáneo (App Completa):** Para correr el ecosistema completo (Backend + Mobile) desde la **raíz del proyecto**:
-    ```bash
-    npm run dev
-    ```
+### Paso 4: Verificación
+Abre tu panel de control de Supabase web, ve a la sección "Table Editor" y verifica que tablas como `profiles`, `ledgers` y `transactions` se hayan creado exitosamente.
 
 ## 🛠️ Configuración Local
 
-1.  **Variables de Entorno:** Crea un `.env` con `SUPABASE_URL` para la conexión de base de datos.
-2.  **Validar Tipos:** `npx tsc --noEmit`
+1.  **Validar Tipos:** `npx tsc --noEmit`

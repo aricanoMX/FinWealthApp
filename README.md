@@ -12,17 +12,48 @@ Este repositorio sigue una estructura de monorepo lógico que contiene tres proy
 
 ---
 
-## 🚀 Inicio Rápido (Ejecución Simultánea)
+## 🚀 Inicio Rápido (Paso a Paso desde Cero)
 
-Para iniciar todos los servicios del ecosistema localmente con un solo comando:
+Para que cualquier usuario pueda levantar la instancia del ecosistema FinWealth sin problemas, sigue exactamente estos pasos:
 
-1.  **Instalar dependencias en la raíz:** `npm install`
-2.  **Configurar Variables de Env:** Asegúrate de tener los archivos `.env` configurados en `/finwealth-backend` y `/finwealth-mobile` según sus respectivos READMEs.
-3.  **Ejecutar todo en paralelo:**
-    ```bash
-    npm run dev
-    ```
-    *Este comando iniciará el backend en el puerto 3000 y el servidor de Expo de manera simultánea.*
+### Requisitos Previos Indispensables
+* Instalar **Node.js** (v20 o superior).
+* Crear una cuenta gratuita en [Supabase](https://supabase.com/).
+* Descargar la aplicación **Expo Go** en tu celular (iOS o Android).
+
+### Paso 1: Preparar la Base de Datos (Supabase)
+1. Entra a Supabase y crea un nuevo proyecto.
+2. Ve a `Project Settings` > `API` y guarda tu `Project URL` y tu `anon public key`.
+3. Ve a `Project Settings` > `Database` y guarda tu **Connection string (URI)**. *Asegúrate de reemplazar el placeholder de la contraseña con tu contraseña real*.
+
+### Paso 2: Clonar e Instalar
+Clona el repositorio e instala las dependencias de todos los workspaces de golpe:
+```bash
+git clone <tu-repositorio>
+cd FinWealthApp
+npm install
+```
+
+### Paso 3: Inyección de Variables de Entorno (¡Crucial!)
+Necesitas crear 3 archivos `.env` en los distintos proyectos. Puedes basarte en los `.env.example` si existen, o crearlos manualmente:
+* **En `/finwealth-infra/.env`**: Añade `SUPABASE_URL` (El connection string de PostgreSQL).
+* **En `/finwealth-backend/.env`**: Añade `SUPABASE_URL` (El mismo connection string) y `PORT=3000`.
+* **En `/finwealth-mobile/.env`**: Añade `EXPO_PUBLIC_API_URL` (IP de tu máquina), `EXPO_PUBLIC_SUPABASE_URL` y `EXPO_PUBLIC_SUPABASE_ANON_KEY`.
+
+### Paso 4: Inicializar el Esquema de Base de Datos
+Empuja las tablas y las políticas de seguridad a tu Supabase en blanco:
+```bash
+cd finwealth-infra
+npx drizzle-kit push
+cd ..
+```
+
+### Paso 5: Arranque Simultáneo
+Vuelve a la raíz del proyecto y ejecuta:
+```bash
+npm run dev
+```
+*Este comando abrirá dos procesos en paralelo: el servidor backend en el puerto 3000 y el empaquetador de Expo con un código QR listo para escanear.*
 
 ---
 

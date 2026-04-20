@@ -4,26 +4,31 @@ Este es el núcleo lógico del ecosistema FinWealth, construido sobre **NestJS**
 
 ## 🚀 Inicio Rápido (Paso a Paso)
 
-### 1. Instalación de Dependencias
-Ejecuta el siguiente comando dentro de esta carpeta para instalar las librerías necesarias:
-```bash
-npm install
-```
-
-### 2. Configuración de Entorno (.env)
-Crea un archivo `.env` en este directorio con las siguientes variables esenciales:
+### Paso 1: Configuración de Entorno (.env)
+Crea un archivo `.env` en la raíz de `finwealth-backend` con las siguientes variables esenciales:
 ```env
-SUPABASE_URL=tu_url_de_supabase
+# Cadena de conexión PostgreSQL (misma que en infra)
+SUPABASE_URL=tu_cadena_de_conexion_postgresql
+# URL de API y clave anónima (si se requieren para validación JWT)
+SUPABASE_API_URL=tu_url_de_api_supabase
 SUPABASE_KEY=tu_clave_anonima_de_supabase
 PORT=3000
 ```
 
-### 3. Ejecución
-*   **Modo Individual:** Para correr solo el backend: `npm run start:dev`
-*   **Modo Simultáneo (Recomendado):** Para correr todo el ecosistema (Backend + Mobile) al mismo tiempo, ve a la **raíz del proyecto** y ejecuta:
-    ```bash
-    npm run dev
-    ```
+### Paso 2: Instalación de Dependencias
+Si no las instalaste desde la raíz, hazlo aquí:
+```bash
+npm install
+```
+
+### Paso 3: Arrancar el Servidor
+Para correr solo el backend de forma local:
+```bash
+npm run start:dev
+```
+
+### Paso 4: Verificación de Salud
+Abre tu navegador web e ingresa a `http://localhost:3000`. Deberías recibir una respuesta (ej. "Hello World" o similar) indicando que NestJS inicializó el `CpaEngineModule` y está escuchando correctamente.
 
 ## 🛠️ Estándares y TDD
 
