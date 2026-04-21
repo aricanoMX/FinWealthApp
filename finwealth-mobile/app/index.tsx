@@ -1,8 +1,8 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, Button } from 'react-native';
-import { useAppStore } from './src/store/app.store';
+import { useAppStore } from '../src/store/app.store';
 
-export default function App() {
+export default function Home() {
   const isInitialized = useAppStore((state) => state.isInitialized);
   const setInitialized = useAppStore((state) => state.setInitialized);
 
@@ -32,5 +32,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 16,
-  }
+  },
 });
