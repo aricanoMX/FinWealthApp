@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, useState } from 'react';
 import {
   View,
   Text,
@@ -6,11 +6,13 @@ import {
   ActivityIndicator,
   ScrollView,
   RefreshControl,
+  TouchableOpacity,
 } from 'react-native';
 import { theme } from '../../src/theme/theme';
 import FadeInView from '../../src/components/ui/FadeInView';
 import { useAnalyticsStore } from '../../src/store/analytics.store';
 import { useAuthStore } from '../../src/store/auth.store';
+import { QuickTransactionModal } from '../../src/components/ui/QuickTransactionModal';
 
 const currencyFormatter = new Intl.NumberFormat('en-US', {
   style: 'currency',
@@ -29,6 +31,7 @@ export default function DashboardScreen() {
   const { user, isAuthenticated } = useAuthStore();
   const { netWorth, cashFlow, isLoading, error, fetchNetWorth, fetchCashFlow } =
     useAnalyticsStore();
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
   const fetchData = useCallback(async () => {
     if (!isAuthenticated) return;
@@ -53,105 +56,122 @@ export default function DashboardScreen() {
   }
 
   return (
-    <ScrollView
-      style={styles.scrollView}
-      contentContainerStyle={styles.scrollContent}
-      refreshControl={
-        <RefreshControl
-          refreshing={isLoading}
-          onRefresh={fetchData}
-          tintColor={theme.colors.primary}
-        />
-      }
-    >
-      <FadeInView>
-        <Text style={styles.welcomeText}>Hola, {user?.email.split('@')[0]}</Text>
-        <Text style={styles.title}>Tu Resumen Financiero</Text>
+    <View style={styles.container}>
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        refreshControl={
+          <RefreshControl
+            refreshing={isLoading}
+            onRefresh={fetchData}
+            tintColor={theme.colors.primary}
+          />
+        }
+      >
+        <FadeInView>
+          <Text style={styles.welcomeText}>Hola, {user?.email.split('@')[0]}</Text>
+          <Text style={styles.title}>Tu Resumen Financiero</Text>
 
-        {error && (
-          <View style={styles.errorContainer}>
-            <Text style={styles.errorText}>{error}</Text>
-          </View>
-        )}
-
-        {/* Net Worth Widget */}
-        <View style={[styles.card, styles.netWorthCard]}>
-          <Text style={styles.cardLabel}>Patrimonio Neto</Text>
-          <Text style={styles.netWorthAmount}>{formatCurrency(netWorth?.netWorth ?? '0')}</Text>
-          <View style={styles.divider} />
-          <View style={styles.row}>
-            <View>
-              <Text style={styles.miniLabel}>Activos</Text>
-              <Text style={styles.miniValue}>{formatCurrency(netWorth?.assets ?? '0')}</Text>
+          {error && (
+            <View style={styles.errorContainer}>
+              <Text style={styles.errorText}>{error}</Text>
             </View>
-            <View style={styles.alignRight}>
-              <Text style={styles.miniLabel}>Pasivos</Text>
-              <Text style={[styles.miniValue, styles.errorTextValue]}>
-                {formatCurrency(netWorth?.liabilities ?? '0')}
+          )}
+
+          {/* Net Worth Widget */}
+          <View style={[styles.card, styles.netWorthCard]}>
+            <Text style={styles.cardLabel}>Patrimonio Neto</Text>
+            <Text style={styles.netWorthAmount}>{formatCurrency(netWorth?.netWorth ?? '0')}</Text>
+            <View style={styles.divider} />
+            <View style={styles.row}>
+              <View>
+                <Text style={styles.miniLabel}>Activos</Text>
+                <Text style={styles.miniValue}>{formatCurrency(netWorth?.assets ?? '0')}</Text>
+              </View>
+              <View style={styles.alignRight}>
+                <Text style={styles.miniLabel}>Pasivos</Text>
+                <Text style={[styles.miniValue, styles.errorTextValue]}>
+                  {formatCurrency(netWorth?.liabilities ?? '0')}
+                </Text>
+              </View>
+            </View>
+          </View>
+
+          {/* Monthly Summary Widget */}
+          <View style={styles.card}>
+            <Text style={styles.cardLabel}>Resumen del Mes</Text>
+            <View style={styles.row}>
+              <View style={styles.flex1}>
+                <Text style={styles.miniLabel}>Ingresos</Text>
+                <Text style={[styles.summaryValue, styles.successText]}>
+                  {formatCurrency(cashFlow?.income ?? '0')}
+                </Text>
+              </View>
+              <View style={[styles.flex1, styles.alignRight]}>
+                <Text style={styles.miniLabel}>Gastos</Text>
+                <Text style={[styles.summaryValue, styles.errorTextValue]}>
+                  {formatCurrency(cashFlow?.expenses ?? '0')}
+                </Text>
+              </View>
+            </View>
+            <View style={styles.divider} />
+            <View style={styles.row}>
+              <Text style={styles.miniLabel}>Flujo Neto</Text>
+              <Text
+                style={[
+                  styles.miniValue,
+                  {
+                    color:
+                      parseFloat(cashFlow?.netCashFlow ?? '0') >= 0
+                        ? theme.colors.secondary
+                        : theme.colors.error,
+                  },
+                ]}
+              >
+                {formatCurrency(cashFlow?.netCashFlow ?? '0')}
               </Text>
             </View>
           </View>
-        </View>
 
-        {/* Monthly Summary Widget */}
-        <View style={styles.card}>
-          <Text style={styles.cardLabel}>Resumen del Mes</Text>
-          <View style={styles.row}>
-            <View style={styles.flex1}>
-              <Text style={styles.miniLabel}>Ingresos</Text>
-              <Text style={[styles.summaryValue, styles.successText]}>
-                {formatCurrency(cashFlow?.income ?? '0')}
-              </Text>
-            </View>
-            <View style={[styles.flex1, styles.alignRight]}>
-              <Text style={styles.miniLabel}>Gastos</Text>
-              <Text style={[styles.summaryValue, styles.errorTextValue]}>
-                {formatCurrency(cashFlow?.expenses ?? '0')}
-              </Text>
-            </View>
-          </View>
-          <View style={styles.divider} />
-          <View style={styles.row}>
-            <Text style={styles.miniLabel}>Flujo Neto</Text>
-            <Text
-              style={[
-                styles.miniValue,
-                {
-                  color:
-                    parseFloat(cashFlow?.netCashFlow ?? '0') >= 0
-                      ? theme.colors.secondary
-                      : theme.colors.error,
-                },
-              ]}
-            >
-              {formatCurrency(cashFlow?.netCashFlow ?? '0')}
-            </Text>
-          </View>
-        </View>
+          {isLoading && !netWorth && !cashFlow && (
+            <ActivityIndicator size="large" color={theme.colors.primary} style={styles.loader} />
+          )}
+        </FadeInView>
+      </ScrollView>
 
-        {isLoading && !netWorth && !cashFlow && (
-          <ActivityIndicator size="large" color={theme.colors.primary} style={styles.loader} />
-        )}
-      </FadeInView>
-    </ScrollView>
+      {/* FAB */}
+      <TouchableOpacity
+        style={styles.fab}
+        onPress={() => setIsModalVisible(true)}
+        activeOpacity={0.8}
+      >
+        <Text style={styles.fabIcon}>+</Text>
+      </TouchableOpacity>
+
+      <QuickTransactionModal
+        isVisible={isModalVisible}
+        onClose={() => {
+          setIsModalVisible(false);
+          fetchData(); // Refresh data after transaction
+        }}
+        ledgerId={LEDGER_ID}
+      />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
-    backgroundColor: theme.colors.background,
   },
   scrollContent: {
     padding: theme.spacing[24],
     paddingTop: theme.spacing[48],
+    paddingBottom: 100, // Extra space for FAB
   },
   container: {
     flex: 1,
     backgroundColor: theme.colors.background,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: theme.spacing[24],
   },
   welcomeText: {
     fontSize: 14,
@@ -243,5 +263,29 @@ const styles = StyleSheet.create({
     color: theme.colors.error,
     fontSize: 14,
     textAlign: 'center',
+    marginTop: 10,
+  },
+  fab: {
+    position: 'absolute',
+    right: theme.spacing[24],
+    bottom: theme.spacing[32],
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: theme.colors.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 8,
+    shadowColor: theme.colors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    zIndex: 10,
+  },
+  fabIcon: {
+    fontSize: 32,
+    color: theme.colors.background,
+    fontWeight: 'bold',
   },
 });
+
