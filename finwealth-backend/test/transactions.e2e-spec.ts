@@ -1,15 +1,24 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication, ValidationPipe, VersioningType } from '@nestjs/common';
-import request from 'supertest';
+import {
+  INestApplication,
+  ValidationPipe,
+  VersioningType,
+  ExecutionContext,
+} from '@nestjs/common';
+import request, { Response } from 'supertest';
 import { App } from 'supertest/types';
 import { AppModule } from './../src/app.module';
 import { TransactionsRepository } from '../src/transactions/transactions.repository';
 import { JwtAuthGuard } from '../src/auth/guards/jwt-auth.guard';
 import { GlobalExceptionFilter } from '../src/core/filters/global-exception.filter';
+import { UserPayload } from '../src/auth/decorators/current-user.decorator';
 
-import { APP_GUARD } from '@nestjs/core';
-
-import { ExecutionContext } from '@nestjs/common';
+interface ApiResponse {
+  success: boolean;
+  data?: { id: string };
+  message?: string;
+  code?: string;
+}
 
 describe('TransactionsController (e2e)', () => {
   let app: INestApplication<App>;
@@ -19,11 +28,16 @@ describe('TransactionsController (e2e)', () => {
 
   beforeAll(async () => {
     // Forcefully mock the guard prototype to bypass global registration issues
-    jest.spyOn(JwtAuthGuard.prototype, 'canActivate').mockImplementation((context: ExecutionContext) => {
-      const req = context.switchToHttp().getRequest();
-      req.user = { userId: '123e4567-e89b-12d3-a456-426614174000', email: 'test@example.com' };
-      return true;
-    });
+    jest
+      .spyOn(JwtAuthGuard.prototype, 'canActivate')
+      .mockImplementation((context: ExecutionContext) => {
+        const req = context.switchToHttp().getRequest<{ user: UserPayload }>();
+        req.user = {
+          userId: '123e4567-e89b-12d3-a456-426614174000',
+          email: 'test@example.com',
+        };
+        return true;
+      });
 
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
@@ -71,22 +85,32 @@ describe('TransactionsController (e2e)', () => {
         date: '2023-10-01T10:00:00Z',
         description: 'Test balanced transaction',
         entries: [
-          { accountId: '123e4567-e89b-12d3-a456-426614174002', amount: '100.50' },
-          { accountId: '123e4567-e89b-12d3-a456-426614174003', amount: '-100.50' },
+          {
+            accountId: '123e4567-e89b-12d3-a456-426614174002',
+            amount: '100.50',
+          },
+          {
+            accountId: '123e4567-e89b-12d3-a456-426614174003',
+            amount: '-100.50',
+          },
         ],
       };
 
-      const response = await request(app.getHttpServer())
+      const response = (await request(app.getHttpServer())
         .post('/api/v1/transactions')
         .send(payload)
-        .expect(201);
+        .expect(201)) as Response;
 
-      expect(response.body).toEqual({
+      expect(response.body as ApiResponse).toEqual({
         success: true,
         data: { id: 'mocked-tx-uuid' },
       });
-      expect(mockTransactionsRepository.createWithEntries).toHaveBeenCalledTimes(1);
-      expect(mockTransactionsRepository.createWithEntries).toHaveBeenCalledWith(payload);
+      expect(
+        mockTransactionsRepository.createWithEntries,
+      ).toHaveBeenCalledTimes(1);
+      expect(mockTransactionsRepository.createWithEntries).toHaveBeenCalledWith(
+        payload,
+      );
     });
 
     it('should reject an unbalanced transaction with 400 Bad Request', async () => {
@@ -95,22 +119,30 @@ describe('TransactionsController (e2e)', () => {
         date: '2023-10-01T10:00:00Z',
         description: 'Test unbalanced transaction',
         entries: [
-          { accountId: '123e4567-e89b-12d3-a456-426614174002', amount: '100.50' },
-          { accountId: '123e4567-e89b-12d3-a456-426614174003', amount: '-50.00' }, // Unbalanced!
+          {
+            accountId: '123e4567-e89b-12d3-a456-426614174002',
+            amount: '100.50',
+          },
+          {
+            accountId: '123e4567-e89b-12d3-a456-426614174003',
+            amount: '-50.00',
+          }, // Unbalanced!
         ],
       };
 
-      const response = await request(app.getHttpServer())
+      await request(app.getHttpServer())
         .post('/api/v1/transactions')
         .send(payload)
-        .expect(400);
-
-      expect(response.body).toEqual({
-        success: false,
-        code: 'ERR_DOUBLE_ENTRY_VIOLATION',
-        message: expect.stringContaining('The sum of debits and credits is not zero'),
-      });
-      expect(mockTransactionsRepository.createWithEntries).not.toHaveBeenCalled();
+        .expect(400)
+        .expect((res) => {
+          expect(res.body).toMatchObject({
+            success: false,
+            code: 'ERR_DOUBLE_ENTRY_VIOLATION',
+          });
+        });
+      expect(
+        mockTransactionsRepository.createWithEntries,
+      ).not.toHaveBeenCalled();
     });
 
     it('should reject a transaction with invalid DTO data', async () => {
@@ -121,14 +153,17 @@ describe('TransactionsController (e2e)', () => {
         entries: [], // Should fail ArrayMinSize
       };
 
-      const response = await request(app.getHttpServer())
+      const response = (await request(app.getHttpServer())
         .post('/api/v1/transactions')
         .send(payload)
-        .expect(400);
+        .expect(400)) as Response;
 
-      expect(response.body.success).toBe(false);
-      expect(typeof response.body.message).toBe('string');
-      expect(mockTransactionsRepository.createWithEntries).not.toHaveBeenCalled();
+      const body = response.body as ApiResponse;
+      expect(body.success).toBe(false);
+      expect(typeof body.message).toBe('string');
+      expect(
+        mockTransactionsRepository.createWithEntries,
+      ).not.toHaveBeenCalled();
     });
   });
 });

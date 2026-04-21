@@ -8,8 +8,8 @@ jest.mock('react-native-reanimated', () => {
   const Reanimated = require('react-native-reanimated/mock');
 
   // Add missing mocks for the timing/delay functions if needed
-  Reanimated.withDelay = jest.fn((delay, animation) => animation);
-  Reanimated.withTiming = jest.fn((toValue, config) => toValue);
+  Reanimated.withDelay = jest.fn((_delay, animation) => animation);
+  Reanimated.withTiming = jest.fn((toValue) => toValue);
   Reanimated.Easing = {
     out: jest.fn(() => ({})),
     exp: jest.fn(() => ({})),
@@ -24,7 +24,7 @@ describe('FadeInView', () => {
     const { getByText } = render(
       <FadeInView>
         <Text>Test Animation</Text>
-      </FadeInView>
+      </FadeInView>,
     );
     expect(getByText('Test Animation')).toBeTruthy();
   });
@@ -34,9 +34,9 @@ describe('FadeInView', () => {
     const { getByTestId } = render(
       <FadeInView style={customStyle} testID="fade-in-view">
         <Text>Styled View</Text>
-      </FadeInView>
+      </FadeInView>,
     );
-    
+
     // In many RN testing setups, Animated.View might be rendered as a View
     const view = getByTestId('fade-in-view');
     expect(view.props.style).toContainEqual(customStyle);
