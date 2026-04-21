@@ -163,3 +163,27 @@ export const accountMetadata = pgTable('account_metadata', {
     )`,
   })
 ]);
+
+// 4. Presupuestos y Metas (Budgets)
+export const budgets = pgTable('budgets', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  ledgerId: uuid('ledger_id')
+    .notNull()
+    .references(() => ledgers.id, { onDelete: 'cascade' }),
+  accountId: uuid('account_id')
+    .references(() => accounts.id, { onDelete: 'set null' }),
+  category: text('category'), // Para presupuestar por tag/categoría
+  amountLimit: numeric('amount_limit', { precision: 15, scale: 2 }).notNull(),
+  periodMonth: integer('period_month').notNull(), // 1-12
+  periodYear: integer('period_year').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+}, (table) => [
+  index('idx_budgets_ledger_period').on(table.ledgerId, table.periodYear, table.periodMonth),
+  pgPolicy('Budgets ledger owner policy', {
+    as: 'permissive',
+    for: 'all',
+    to: 'authenticated',
+    using: sql`exists (select 1 from ledgers where ledgers.id = ${table.ledgerId} and ledgers.user_id = ${authUid})`,
+  })
+]);
