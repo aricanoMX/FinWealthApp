@@ -1,15 +1,16 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { theme } from '../../src/theme/theme';
+import FadeInView from '../../src/components/ui/FadeInView';
 
 export default function ReportsScreen() {
   return (
-    <View style={styles.container}>
+    <FadeInView style={styles.container}>
       <Text style={styles.title}>Reportes</Text>
       <View style={styles.card}>
         <Text style={styles.cardText}>Analizando tus activos...</Text>
       </View>
-    </View>
+    </FadeInView>
   );
 }
 

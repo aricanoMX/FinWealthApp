@@ -4,6 +4,7 @@ import { theme } from '../../src/theme/theme';
 import { Button } from '../../src/components/ui/Button';
 import { useAuthStore } from '../../src/store/auth.store';
 import { useRouter } from 'expo-router';
+import FadeInView from '../../src/components/ui/FadeInView';
 
 export default function ProfileScreen() {
   const { user, logout, isAuthenticated } = useAuthStore();
@@ -16,18 +17,14 @@ export default function ProfileScreen() {
   }, [isAuthenticated, router]);
 
   return (
-    <View style={styles.container}>
+    <FadeInView style={styles.container}>
       <Text style={styles.title}>Perfil Elite</Text>
       <View style={styles.card}>
         <Text style={styles.label}>Email:</Text>
         <Text style={styles.value}>{user?.email || 'Inversionista'}</Text>
       </View>
-      <Button 
-        title="Cerrar Sesión" 
-        onPress={logout} 
-        style={styles.logoutButton}
-      />
-    </View>
+      <Button title="Cerrar Sesión" onPress={logout} style={styles.logoutButton} />
+    </FadeInView>
   );
 }
 

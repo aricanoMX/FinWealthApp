@@ -1,15 +1,16 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { theme } from '../../src/theme/theme';
+import FadeInView from '../../src/components/ui/FadeInView';
 
 export default function TransactionsScreen() {
   return (
-    <View style={styles.container}>
+    <FadeInView style={styles.container}>
       <Text style={styles.title}>Transacciones</Text>
       <View style={styles.card}>
         <Text style={styles.cardText}>No hay movimientos registrados hoy.</Text>
       </View>
-    </View>
+    </FadeInView>
   );
 }
 
