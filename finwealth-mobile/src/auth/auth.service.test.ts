@@ -32,7 +32,7 @@ describe('AuthService', () => {
       });
 
       await expect(AuthService.signInWithEmail('test@test.com', 'wrong')).rejects.toThrow(
-        'Invalid credentials'
+        'Invalid credentials',
       );
       expect(SessionService.setToken).not.toHaveBeenCalled();
     });
@@ -44,7 +44,7 @@ describe('AuthService', () => {
       });
 
       await expect(AuthService.signInWithEmail('test@test.com', 'password')).rejects.toThrow(
-        'Sesión no retornada por el servidor.'
+        'Sesión no retornada por el servidor.',
       );
     });
 
@@ -67,7 +67,7 @@ describe('AuthService', () => {
   describe('signOut', () => {
     it('should call supabase signout and clear token', async () => {
       await AuthService.signOut();
-      
+
       expect(supabase.auth.signOut).toHaveBeenCalled();
       expect(SessionService.clearToken).toHaveBeenCalled();
     });

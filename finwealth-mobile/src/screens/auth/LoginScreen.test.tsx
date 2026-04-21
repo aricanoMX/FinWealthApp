@@ -19,7 +19,7 @@ describe('<LoginScreen />', () => {
 
   it('renders title, inputs and button correctly', () => {
     const { getByText, getByTestId } = render(<LoginScreen />);
-    
+
     expect(getByText('FinWealth App')).toBeTruthy();
     expect(getByTestId('email-input')).toBeTruthy();
     expect(getByTestId('password-input')).toBeTruthy();
@@ -28,7 +28,7 @@ describe('<LoginScreen />', () => {
 
   it('shows error when fields are empty and button is pressed', () => {
     const { getByTestId, queryByTestId } = render(<LoginScreen />);
-    
+
     // initially no error
     expect(queryByTestId('error-message')).toBeNull();
 
@@ -44,8 +44,8 @@ describe('<LoginScreen />', () => {
     const errorMessage = 'Invalid credentials';
     (AuthService.signInWithEmail as jest.Mock).mockRejectedValueOnce(new Error(errorMessage));
 
-    const { getByTestId, queryByTestId } = render(<LoginScreen />);
-    
+    const { getByTestId } = render(<LoginScreen />);
+
     // fill inputs
     fireEvent.changeText(getByTestId('email-input'), 'test@test.com');
     fireEvent.changeText(getByTestId('password-input'), 'password123');
@@ -67,7 +67,7 @@ describe('<LoginScreen />', () => {
     (AuthService.signInWithEmail as jest.Mock).mockResolvedValueOnce(mockUser);
 
     const { getByTestId, queryByTestId } = render(<LoginScreen />);
-    
+
     // fill inputs
     fireEvent.changeText(getByTestId('email-input'), 'test@test.com');
     fireEvent.changeText(getByTestId('password-input'), 'password123');

@@ -1,4 +1,4 @@
-import axios, { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
+import { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 import { apiClient, AppError } from './client';
 import { SessionService } from '../auth/session.service';
 
@@ -31,7 +31,7 @@ describe('API Client Interceptor', () => {
   it('should attach Authorization header if token exists', async () => {
     const mockAxios = require('axios').create();
     const requestHandler = mockAxios.interceptors.request.use.mock.calls[0][0];
-    
+
     (SessionService.getToken as jest.Mock).mockResolvedValue('test-token');
 
     const config: InternalAxiosRequestConfig = { headers: {} } as any;

@@ -14,10 +14,10 @@ describe('useAppStore', () => {
 
   it('should update isInitialized when setInitialized is called', () => {
     const { setInitialized } = useAppStore.getState();
-    
+
     // Call the action
     setInitialized(true);
-    
+
     // Check the new state
     expect(useAppStore.getState().isInitialized).toBe(true);
   });

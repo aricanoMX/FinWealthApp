@@ -48,11 +48,8 @@ apiClient.interceptors.response.use(
       const serverError = error.response.data;
       throw new AppError(serverError.code, serverError.message, serverError.details);
     }
-    
+
     // Si es un error de red o no tiene el payload esperado
-    throw new AppError(
-      'NETWORK_ERROR',
-      error.message || 'Error de conexión con el servidor.'
-    );
-  }
+    throw new AppError('NETWORK_ERROR', error.message || 'Error de conexión con el servidor.');
+  },
 );

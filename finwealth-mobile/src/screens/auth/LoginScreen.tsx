@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, KeyboardAvoidingView, Platform, Alert } from 'react-native';
+import { View, Text, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
 import { Input } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
 import { AuthService } from '../../auth/auth.service';
@@ -10,7 +10,7 @@ export const LoginScreen = () => {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  
+
   const login = useAuthStore((state) => state.login);
 
   const handleLogin = async () => {
@@ -41,8 +41,12 @@ export const LoginScreen = () => {
       <View style={styles.formContainer}>
         <Text style={styles.title}>FinWealth App</Text>
         <Text style={styles.subtitle}>Inicia sesión para continuar</Text>
-        
-        {error ? <Text style={styles.errorText} testID="error-message">{error}</Text> : null}
+
+        {error ? (
+          <Text style={styles.errorText} testID="error-message">
+            {error}
+          </Text>
+        ) : null}
 
         <Input
           label="Email"
