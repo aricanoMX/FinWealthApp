@@ -3,6 +3,7 @@ import { DATABASE_CONNECTION } from '../core/database/database.module';
 import { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import * as schema from 'finwealth-infra/src/schema';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
+import { eq, sql, desc } from 'drizzle-orm';
 
 @Injectable()
 export class TransactionsRepository {
@@ -43,5 +44,35 @@ export class TransactionsRepository {
 
       return transactionId;
     });
+  }
+
+  /**
+   * Fetches the most used accounts for a given ledger.
+   */
+  async getMostUsedAccounts(
+    ledgerId: string,
+    limit: number = 5,
+  ): Promise<{ accountId: string; name: string; count: number }[]> {
+    const results = (await this.db
+      .select({
+        accountId: schema.journalEntries.accountId,
+        name: schema.accounts.name,
+        count: sql<number>`cast(count(*) as integer)`,
+      })
+      .from(schema.journalEntries)
+      .innerJoin(
+        schema.transactions,
+        eq(schema.transactions.id, schema.journalEntries.transactionId),
+      )
+      .innerJoin(
+        schema.accounts,
+        eq(schema.accounts.id, schema.journalEntries.accountId),
+      )
+      .where(eq(schema.transactions.ledgerId, ledgerId))
+      .groupBy(schema.journalEntries.accountId, schema.accounts.name)
+      .orderBy(desc(sql`count(*)`))
+      .limit(limit)) as { accountId: string; name: string; count: number }[];
+
+    return results;
   }
 }

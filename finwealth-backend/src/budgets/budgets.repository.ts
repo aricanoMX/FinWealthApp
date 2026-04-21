@@ -57,7 +57,9 @@ export class BudgetsRepository {
         let result: { total: string | null }[];
 
         if (budget.accountId) {
-          conditions.push(eq(schema.journalEntries.accountId, budget.accountId));
+          conditions.push(
+            eq(schema.journalEntries.accountId, budget.accountId),
+          );
           result = await this.db
             .select({ total: sum(schema.journalEntries.amount) })
             .from(schema.journalEntries)
@@ -67,7 +69,9 @@ export class BudgetsRepository {
             )
             .where(and(...conditions));
         } else if (budget.category) {
-          conditions.push(sql`${schema.journalEntries.metadata}->>'category' = ${budget.category}`);
+          conditions.push(
+            sql`${schema.journalEntries.metadata}->>'category' = ${budget.category}`,
+          );
           result = await this.db
             .select({ total: sum(schema.journalEntries.amount) })
             .from(schema.journalEntries)

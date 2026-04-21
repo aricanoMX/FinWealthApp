@@ -33,7 +33,12 @@ export class BudgetsService {
     return this.budgetsRepository.createBudget(data);
   }
 
-  async getBudgetPerformance(userId: string, ledgerId: string, month: number, year: number) {
+  async getBudgetPerformance(
+    userId: string,
+    ledgerId: string,
+    month: number,
+    year: number,
+  ) {
     await this.verifyLedgerOwnership(ledgerId, userId);
     return this.budgetsRepository.getBudgetPerformance(ledgerId, month, year);
   }

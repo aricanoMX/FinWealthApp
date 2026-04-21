@@ -11,6 +11,7 @@ describe('TransactionsController', () => {
   beforeEach(async () => {
     const mockService = {
       createTransaction: jest.fn(),
+      getAccountSuggestions: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -24,6 +25,27 @@ describe('TransactionsController', () => {
 
   it('should be defined', () => {
     expect(controller).toBeDefined();
+  });
+
+  describe('getSuggestions', () => {
+    it('should return suggestions from the service', async () => {
+      const suggestions = [{ accountId: 'acc-1', name: 'Food', count: 10 }];
+      const user = { userId: 'user-123', email: 'test@test.com' };
+      const ledgerId = 'ledger-1';
+
+      service.getAccountSuggestions.mockResolvedValue(suggestions);
+
+      const result = await controller.getSuggestions(ledgerId, user);
+
+      expect(service.getAccountSuggestions).toHaveBeenCalledWith(
+        ledgerId,
+        user.userId,
+      );
+      expect(result).toEqual({
+        success: true,
+        data: suggestions,
+      });
+    });
   });
 
   describe('create', () => {

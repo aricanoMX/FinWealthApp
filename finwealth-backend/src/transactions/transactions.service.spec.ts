@@ -15,6 +15,7 @@ describe('TransactionsService', () => {
     const mockRepository = {
       createWithEntries: jest.fn(),
       getGlobalBalance: jest.fn(),
+      getMostUsedAccounts: jest.fn(),
     };
 
     const mockDoubleEntryService = {
@@ -32,6 +33,21 @@ describe('TransactionsService', () => {
     service = module.get<TransactionsService>(TransactionsService);
     repository = module.get(TransactionsRepository);
     doubleEntryService = module.get(DoubleEntryService);
+  });
+
+  describe('getAccountSuggestions', () => {
+    it('should return account suggestions from repository', async () => {
+      const suggestions = [
+        { accountId: 'acc-1', name: 'Food', count: 10 },
+        { accountId: 'acc-2', name: 'Rent', count: 5 },
+      ];
+      repository.getMostUsedAccounts.mockResolvedValue(suggestions);
+
+      const result = await service.getAccountSuggestions('ledger-1', 'user-123');
+
+      expect(repository.getMostUsedAccounts).toHaveBeenCalledWith('ledger-1');
+      expect(result).toEqual(suggestions);
+    });
   });
 
   it('should process a valid transaction', async () => {

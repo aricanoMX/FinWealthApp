@@ -25,7 +25,10 @@ export class BudgetsController {
   @ApiQuery({ name: 'ledgerId', type: 'string', required: true })
   @ApiQuery({ name: 'month', type: 'number', required: true })
   @ApiQuery({ name: 'year', type: 'number', required: true })
-  @ApiResponse({ status: 200, description: 'Budget performance data retrieved' })
+  @ApiResponse({
+    status: 200,
+    description: 'Budget performance data retrieved',
+  })
   async getPerformance(
     @CurrentUser() user: UserPayload,
     @Query('ledgerId') ledgerId: string,

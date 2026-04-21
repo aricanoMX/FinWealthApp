@@ -1,4 +1,11 @@
-import { IsUUID, IsNumber, IsOptional, IsString, Min, Max } from 'class-validator';
+import {
+  IsUUID,
+  IsNumber,
+  IsOptional,
+  IsString,
+  Min,
+  Max,
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateBudgetDto {
@@ -6,12 +13,18 @@ export class CreateBudgetDto {
   @IsUUID()
   ledgerId: string;
 
-  @ApiProperty({ description: 'Optional account ID to filter by', required: false })
+  @ApiProperty({
+    description: 'Optional account ID to filter by',
+    required: false,
+  })
   @IsOptional()
   @IsUUID()
   accountId?: string;
 
-  @ApiProperty({ description: 'Optional category to filter by', required: false })
+  @ApiProperty({
+    description: 'Optional category to filter by',
+    required: false,
+  })
   @IsOptional()
   @IsString()
   category?: string;

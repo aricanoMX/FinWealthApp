@@ -1,9 +1,18 @@
-import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  HttpCode,
+  HttpStatus,
+  Get,
+  Query,
+} from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
   ApiResponse,
   ApiBearerAuth,
+  ApiQuery,
 } from '@nestjs/swagger';
 import { TransactionsService } from './transactions.service';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
@@ -51,6 +60,38 @@ export class TransactionsController {
     return {
       success: true,
       data: result,
+    };
+  }
+
+  @Get('suggestions')
+  @ApiOperation({
+    summary: 'Get most used accounts as suggestions for a ledger',
+  })
+  @ApiQuery({ name: 'ledgerId', type: 'string', required: true })
+  @ApiResponse({
+    status: 200,
+    description: 'List of account suggestions based on frequency.',
+    schema: {
+      example: {
+        success: true,
+        data: [
+          { accountId: 'uuid', name: 'Alimentos', count: 12 },
+          { accountId: 'uuid', name: 'Transporte', count: 8 },
+        ],
+      },
+    },
+  })
+  async getSuggestions(
+    @Query('ledgerId') ledgerId: string,
+    @CurrentUser() user: UserPayload,
+  ) {
+    const results = await this.transactionsService.getAccountSuggestions(
+      ledgerId,
+      user.userId,
+    );
+    return {
+      success: true,
+      data: results,
     };
   }
 }
