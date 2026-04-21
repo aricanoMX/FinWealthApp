@@ -8,6 +8,7 @@ import { DatabaseModule } from './core/database/database.module';
 import { TransactionsModule } from './transactions/transactions.module';
 import { AuthModule } from './auth/auth.module';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
+import { HealthModule } from './core/health/health.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
     DatabaseModule,
     TransactionsModule,
     AuthModule,
+    HealthModule,
   ],
   controllers: [AppController],
   providers: [

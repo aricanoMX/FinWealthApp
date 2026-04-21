@@ -14,6 +14,12 @@ import {
 } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 
+// TODO: Integrar tipos generados de Supabase (database.types.ts) una vez que se genere el archivo.
+// Ejemplo de uso futuro: 
+// import { Database } from './database.types';
+// export type TransactionRow = Database['public']['Tables']['transactions']['Row'];
+
+
 // Helper de Supabase para obtener el auth.uid() en las políticas RLS
 const authUid = sql`(auth.uid())`;
 
@@ -32,6 +38,8 @@ export const profiles = pgTable('profiles', {
   email: text('email').notNull().unique(),
   fullName: text('full_name'),
   preferences: jsonb('preferences'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
 }, (table) => [
   pgPolicy('Profiles access policy', {
     as: 'permissive',
@@ -47,8 +55,10 @@ export const ledgers = pgTable('ledgers', {
     .notNull()
     .references(() => profiles.id, { onDelete: 'cascade' }),
   name: text('name').notNull(), // Ej. "Personal", "Negocio Freelance"
-  currency: varchar('currency', { length: 3 }).notNull(),
+  currency: varchar('currency', { length: 3 }).notNull(), // ISO 4217 (USD, MXN, EUR)
   isPersonal: boolean('is_personal').default(true).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
 }, (table) => [
   pgPolicy('Ledgers owner policy', {
     as: 'permissive',
@@ -68,8 +78,9 @@ export const accounts = pgTable('accounts', {
   type: accountTypeEnum('type').notNull(),
   parentId: uuid('parent_id'), // Self-reference para jerarquías
   isActive: boolean('is_active').default(true).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
 }, (table) => [
-  // Política para cuentas: Solo puedes interactuar con cuentas cuyo ledger te pertenece
   pgPolicy('Accounts ledger owner policy', {
     as: 'permissive',
     for: 'all',
@@ -85,8 +96,11 @@ export const transactions = pgTable('transactions', {
     .references(() => ledgers.id, { onDelete: 'cascade' }),
   date: timestamp('date').notNull(),
   description: text('description').notNull(),
-  rawData: jsonb('raw_data'), // Red de seguridad para Tentáculos
+  rawData: jsonb('raw_data'), // Red de seguridad para Tentáculos (raw dump)
+  metadata: jsonb('metadata'), // Datos procesados (ej. tags, geo)
   receiptUrl: text('receipt_url'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
 }, (table) => [
   index('idx_transactions_ledger_date').on(table.ledgerId, table.date),
   pgPolicy('Transactions ledger owner policy', {
@@ -108,6 +122,9 @@ export const journalEntries = pgTable('journal_entries', {
   amount: numeric('amount', { precision: 15, scale: 2 }).notNull(), // Débitos Positivos, Créditos Negativos
   isDeductible: boolean('is_deductible').default(false).notNull(),
   taxAmount: numeric('tax_amount', { precision: 15, scale: 2 }),
+  metadata: jsonb('metadata'), // Ej. folio_fiscal, categoria_sat, etc.
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
 }, (table) => [
   index('idx_journal_entries_account_id').on(table.accountId),
   index('idx_journal_entries_transaction_id').on(table.transactionId),
@@ -115,7 +132,6 @@ export const journalEntries = pgTable('journal_entries', {
     as: 'permissive',
     for: 'all',
     to: 'authenticated',
-    // Usar la relación hacia transactions -> ledgers para seguridad RLS
     using: sql`exists (
       select 1 from transactions 
       join ledgers on ledgers.id = transactions.ledger_id 
@@ -124,7 +140,7 @@ export const journalEntries = pgTable('journal_entries', {
   })
 ]);
 
-// 3. Inteligencia Predictiva
+// 3. Inteligencia Predictiva y Metadata Bancaria
 export const accountMetadata = pgTable('account_metadata', {
   accountId: uuid('account_id')
     .primaryKey()
@@ -133,6 +149,8 @@ export const accountMetadata = pgTable('account_metadata', {
   paymentDueDay: integer('payment_due_day'),
   creditLimit: numeric('credit_limit', { precision: 15, scale: 2 }),
   interestRateApr: numeric('interest_rate_apr', { precision: 5, scale: 2 }),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
 }, (table) => [
   pgPolicy('Account metadata owner policy', {
     as: 'permissive',

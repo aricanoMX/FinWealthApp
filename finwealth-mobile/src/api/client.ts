@@ -21,10 +21,13 @@ export class AppError extends Error {
   }
 }
 
+// Ensure the baseURL ends with /api/v1 to match our backend versioning
+const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000';
+const BASE_URL = `${API_URL}/api/v1`;
+
 export const apiClient = axios.create({
-  // EXPO_PUBLIC_ prefix is required for Expo to bundle the env var into the client
-  baseURL: process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000',
-  timeout: 10000,
+  baseURL: BASE_URL,
+  timeout: 15000, // Increased timeout for potentially heavier reports
 });
 
 // Interceptor de Peticiones (Inyectar Token)
@@ -40,8 +43,8 @@ apiClient.interceptors.request.use(async (config) => {
 apiClient.interceptors.response.use(
   (response) => response,
   (error: AxiosError<ApiErrorResponse>) => {
-    // Si tenemos una respuesta estructurada de nuestro backend NestJS
-    if (error.response && error.response.data && error.response.data.code) {
+    // Si tenemos una respuesta estructurada de nuestro backend NestJS (nuestro Error Filter)
+    if (error.response?.data?.code) {
       const serverError = error.response.data;
       throw new AppError(serverError.code, serverError.message, serverError.details);
     }

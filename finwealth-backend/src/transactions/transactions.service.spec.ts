@@ -14,6 +14,7 @@ describe('TransactionsService', () => {
   beforeEach(async () => {
     const mockRepository = {
       createWithEntries: jest.fn(),
+      getGlobalBalance: jest.fn(),
     };
 
     const mockDoubleEntryService = {
