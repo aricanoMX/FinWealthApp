@@ -10,6 +10,7 @@ import { AuthModule } from './auth/auth.module';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { HealthModule } from './core/health/health.module';
 import { AnalyticsModule } from './analytics/analytics.module';
+import { BudgetsModule } from './budgets/budgets.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { AnalyticsModule } from './analytics/analytics.module';
     AuthModule,
     HealthModule,
     AnalyticsModule,
+    BudgetsModule,
   ],
   controllers: [AppController],
   providers: [
