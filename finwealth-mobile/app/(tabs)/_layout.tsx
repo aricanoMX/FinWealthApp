@@ -27,6 +27,10 @@ const ReportsIcon = ({ color, size }: { color: string; size: number }) => (
   <TabBarIcon name="analytics" size={size} color={color} />
 );
 
+const BudgetsIcon = ({ color, size }: { color: string; size: number }) => (
+  <TabBarIcon name="wallet" size={size} color={color} />
+);
+
 const ProfileIcon = ({ color, size }: { color: string; size: number }) => (
   <TabBarIcon name="person" size={size} color={color} />
 );
@@ -60,6 +64,13 @@ export default function TabsLayout() {
         options={{
           title: 'Transacciones',
           tabBarIcon: TransactionsIcon,
+        }}
+      />
+      <Tabs.Screen
+        name="budgets"
+        options={{
+          title: 'Presupuestos',
+          tabBarIcon: BudgetsIcon,
         }}
       />
       <Tabs.Screen
