@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo, useMemo } from 'react';
 import { TextInput, View, Text, StyleSheet, TextInputProps } from 'react-native';
 
 interface InputProps extends TextInputProps {
@@ -6,19 +6,20 @@ interface InputProps extends TextInputProps {
   error?: string;
 }
 
-export const Input = ({ label, error, style, ...props }: InputProps) => {
+export const Input = memo(({ label, error, style, ...props }: InputProps) => {
+  const inputStyle = useMemo(
+    () => [styles.input, error ? styles.inputError : null, style],
+    [error, style],
+  );
+
   return (
     <View style={styles.container}>
       <Text style={styles.label}>{label}</Text>
-      <TextInput
-        style={[styles.input, error ? styles.inputError : null, style]}
-        placeholderTextColor="#999"
-        {...props}
-      />
+      <TextInput style={inputStyle} placeholderTextColor="#999" {...props} />
       {error ? <Text style={styles.errorText}>{error}</Text> : null}
     </View>
   );
-};
+});
 
 const styles = StyleSheet.create({
   container: {

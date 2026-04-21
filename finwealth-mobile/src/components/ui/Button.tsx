@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo, useMemo } from 'react';
 import {
   TouchableOpacity,
   Text,
@@ -12,13 +12,14 @@ interface ButtonProps extends TouchableOpacityProps {
   isLoading?: boolean;
 }
 
-export const Button = ({ title, isLoading, style, disabled, ...props }: ButtonProps) => {
+export const Button = memo(({ title, isLoading, style, disabled, ...props }: ButtonProps) => {
+  const combinedStyle = useMemo(
+    () => [styles.button, (disabled || isLoading) && styles.disabled, style],
+    [disabled, isLoading, style],
+  );
+
   return (
-    <TouchableOpacity
-      style={[styles.button, (disabled || isLoading) && styles.disabled, style]}
-      disabled={disabled || isLoading}
-      {...props}
-    >
+    <TouchableOpacity style={combinedStyle} disabled={disabled || isLoading} {...props}>
       {isLoading ? (
         <ActivityIndicator testID="loading-indicator" color="#fff" />
       ) : (
@@ -26,7 +27,7 @@ export const Button = ({ title, isLoading, style, disabled, ...props }: ButtonPr
       )}
     </TouchableOpacity>
   );
-};
+});
 
 const styles = StyleSheet.create({
   button: {
