@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, KeyboardAvoidingView, Platform } from 'react-na
 import { Input } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
 import { useAuthStore } from '../../store/auth.store';
+import { theme } from '../../theme/theme';
 
 export const LoginScreen = () => {
   const [email, setEmail] = useState('');
@@ -74,32 +75,32 @@ export const LoginScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: theme.colors.background,
   },
   formContainer: {
     flex: 1,
-    padding: 24,
+    padding: theme.spacing[24],
     justifyContent: 'center',
   },
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#000',
-    marginBottom: 8,
+    color: theme.colors.primary,
+    marginBottom: theme.spacing[8],
     textAlign: 'center',
   },
   subtitle: {
     fontSize: 16,
-    color: '#666',
-    marginBottom: 32,
+    color: theme.colors.textMuted,
+    marginBottom: theme.spacing[32],
     textAlign: 'center',
   },
   errorText: {
-    color: '#e74c3c',
-    marginBottom: 16,
+    color: theme.colors.error,
+    marginBottom: theme.spacing[16],
     textAlign: 'center',
   },
   button: {
-    marginTop: 16,
+    marginTop: theme.spacing[16],
   },
 });

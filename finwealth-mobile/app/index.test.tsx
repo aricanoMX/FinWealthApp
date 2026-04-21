@@ -15,7 +15,7 @@ describe('<Home />', () => {
 
   it('updates text when initialized button is pressed', () => {
     render(<Home />);
-    
+
     // Simulate user or system initializing the app
     const button = screen.getByText('Initialize');
     fireEvent.press(button);

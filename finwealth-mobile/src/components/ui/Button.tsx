@@ -6,6 +6,7 @@ import {
   ActivityIndicator,
   TouchableOpacityProps,
 } from 'react-native';
+import { theme } from '../../theme/theme';
 
 interface ButtonProps extends TouchableOpacityProps {
   title: string;
@@ -21,7 +22,7 @@ export const Button = memo(({ title, isLoading, style, disabled, ...props }: But
   return (
     <TouchableOpacity style={combinedStyle} disabled={disabled || isLoading} {...props}>
       {isLoading ? (
-        <ActivityIndicator testID="loading-indicator" color="#fff" />
+        <ActivityIndicator testID="loading-indicator" color={theme.colors.text} />
       ) : (
         <Text style={styles.text}>{title}</Text>
       )}
@@ -31,9 +32,9 @@ export const Button = memo(({ title, isLoading, style, disabled, ...props }: But
 
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: '#000',
-    paddingVertical: 16,
-    paddingHorizontal: 24,
+    backgroundColor: theme.colors.primary,
+    paddingVertical: theme.spacing[16],
+    paddingHorizontal: theme.spacing[24],
     borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
@@ -43,7 +44,7 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   text: {
-    color: '#fff',
+    color: theme.colors.background,
     fontSize: 16,
     fontWeight: 'bold',
   },

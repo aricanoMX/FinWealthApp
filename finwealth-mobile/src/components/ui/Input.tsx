@@ -1,5 +1,6 @@
 import React, { memo, useMemo } from 'react';
 import { TextInput, View, Text, StyleSheet, TextInputProps } from 'react-native';
+import { theme } from '../../theme/theme';
 
 interface InputProps extends TextInputProps {
   label: string;
@@ -15,7 +16,7 @@ export const Input = memo(({ label, error, style, ...props }: InputProps) => {
   return (
     <View style={styles.container}>
       <Text style={styles.label}>{label}</Text>
-      <TextInput style={inputStyle} placeholderTextColor="#999" {...props} />
+      <TextInput style={inputStyle} placeholderTextColor={theme.colors.textMuted} {...props} />
       {error ? <Text style={styles.errorText}>{error}</Text> : null}
     </View>
   );
@@ -23,31 +24,31 @@ export const Input = memo(({ label, error, style, ...props }: InputProps) => {
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 16,
+    marginBottom: theme.spacing[16],
     width: '100%',
   },
   label: {
     fontSize: 14,
     fontWeight: '500',
-    marginBottom: 8,
-    color: '#333',
+    marginBottom: theme.spacing[8],
+    color: theme.colors.text,
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: theme.colors.textMuted,
     borderRadius: 8,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: theme.spacing[16],
+    paddingVertical: theme.spacing[12],
     fontSize: 16,
-    color: '#000',
-    backgroundColor: '#fff',
+    color: theme.colors.text,
+    backgroundColor: theme.colors.surface,
   },
   inputError: {
-    borderColor: '#e74c3c',
+    borderColor: theme.colors.error,
   },
   errorText: {
-    color: '#e74c3c',
+    color: theme.colors.error,
     fontSize: 12,
-    marginTop: 4,
+    marginTop: theme.spacing[4],
   },
 });
