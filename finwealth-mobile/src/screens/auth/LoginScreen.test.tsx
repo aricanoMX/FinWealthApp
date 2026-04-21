@@ -14,7 +14,12 @@ jest.mock('../../auth/auth.service', () => ({
 describe('<LoginScreen />', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    useAuthStore.setState({ user: null, isAuthenticated: false });
+    useAuthStore.setState({
+      user: null,
+      isAuthenticated: false,
+      isLoading: false,
+      error: null,
+    });
   });
 
   it('renders title, inputs and button correctly', () => {

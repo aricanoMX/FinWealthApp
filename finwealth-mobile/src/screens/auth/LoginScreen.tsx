@@ -2,16 +2,13 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
 import { Input } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
-import { AuthService } from '../../auth/auth.service';
 import { useAuthStore } from '../../store/auth.store';
 
 export const LoginScreen = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
 
-  const login = useAuthStore((state) => state.login);
+  const { login, isLoading, error, setError } = useAuthStore();
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -19,18 +16,7 @@ export const LoginScreen = () => {
       return;
     }
 
-    setError('');
-    setIsLoading(true);
-
-    try {
-      const user = await AuthService.signInWithEmail(email, password);
-      login(user);
-      // The store handles authentication state, the navigation stack will react to this
-    } catch (err: any) {
-      setError(err.message || 'Error al iniciar sesión');
-    } finally {
-      setIsLoading(false);
-    }
+    await login(email, password);
   };
 
   return (
@@ -54,7 +40,10 @@ export const LoginScreen = () => {
           keyboardType="email-address"
           autoCapitalize="none"
           value={email}
-          onChangeText={setEmail}
+          onChangeText={(text) => {
+            setEmail(text);
+            if (error) setError(null);
+          }}
           testID="email-input"
         />
 
@@ -63,7 +52,10 @@ export const LoginScreen = () => {
           placeholder="••••••••"
           secureTextEntry
           value={password}
-          onChangeText={setPassword}
+          onChangeText={(text) => {
+            setPassword(text);
+            if (error) setError(null);
+          }}
           testID="password-input"
         />
 

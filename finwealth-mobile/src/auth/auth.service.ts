@@ -1,6 +1,6 @@
 import { supabase } from './supabase.client';
 import { SessionService } from './session.service';
-import { User } from '../store/auth.store';
+import type { User } from '../store/auth.store';
 
 export const AuthService = {
   /**
