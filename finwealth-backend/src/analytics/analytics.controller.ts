@@ -76,4 +76,33 @@ export class AnalyticsController {
       new Date(endDate),
     );
   }
+
+  @Get('health/anomalies')
+  @ApiOperation({
+    summary: 'Detect spending anomalies compared to historical average',
+    description: 'Compares current month spending with the previous 6 months baseline using standard deviation and percentage thresholds.',
+  })
+  @ApiQuery({ name: 'ledgerId', required: true, type: String })
+  @ApiResponse({
+    status: 200,
+    description: 'Anomalies detected successfully.',
+    schema: {
+      example: [
+        {
+          type: 'spike',
+          accountName: 'Dining Out',
+          amountCurrent: 450.0,
+          amountAverage: 200.0,
+          diffPercentage: 125.0,
+        },
+      ],
+    },
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized. JWT token missing or invalid.',
+  })
+  async detectAnomalies(@Query('ledgerId', ParseUUIDPipe) ledgerId: string) {
+    return this.analyticsService.detectAnomalies(ledgerId);
+  }
 }

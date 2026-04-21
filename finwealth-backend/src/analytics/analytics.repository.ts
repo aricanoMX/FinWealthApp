@@ -76,4 +76,89 @@ export class AnalyticsRepository {
       netCashFlow,
     };
   }
+
+  async getHistoricalAggregates(ledgerId: string, months: number) {
+    const startDate = new Date();
+    startDate.setMonth(startDate.getMonth() - months);
+    startDate.setDate(1); // Inicio del mes
+
+    return this.db
+      .select({
+        accountId: schema.journalEntries.accountId,
+        accountName: schema.accounts.name,
+        month: sql<number>`EXTRACT(MONTH FROM ${schema.transactions.date})`,
+        year: sql<number>`EXTRACT(YEAR FROM ${schema.transactions.date})`,
+        totalAmount: sql<string>`SUM(${schema.journalEntries.amount})::TEXT`,
+      })
+      .from(schema.journalEntries)
+      .innerJoin(
+        schema.transactions,
+        eq(schema.journalEntries.transactionId, schema.transactions.id),
+      )
+      .innerJoin(
+        schema.accounts,
+        eq(schema.journalEntries.accountId, schema.accounts.id),
+      )
+      .where(
+        and(
+          eq(schema.transactions.ledgerId, ledgerId),
+          eq(schema.accounts.type, 'expense'),
+          gte(schema.transactions.date, startDate),
+        ),
+      )
+      .groupBy(
+        schema.journalEntries.accountId,
+        schema.accounts.name,
+        sql`EXTRACT(MONTH FROM ${schema.transactions.date})`,
+        sql`EXTRACT(YEAR FROM ${schema.transactions.date})`,
+      );
+  }
+
+  async getHistoricalAverage(ledgerId: string, accountId: string) {
+    const startDate = new Date();
+    startDate.setMonth(startDate.getMonth() - 6);
+    startDate.setDate(1);
+
+    const endDate = new Date();
+    endDate.setDate(0); // Último día del mes anterior
+
+    const result = await this.db
+      .select({
+        average: sql<string>`AVG(monthly_total.total)::TEXT`,
+        stdDev: sql<string>`STDDEV(monthly_total.total)::TEXT`,
+      })
+      .from(
+        this.db
+          .select({
+            total: sql<number>`SUM(${schema.journalEntries.amount})`.as('total'),
+          })
+          .from(schema.journalEntries)
+          .innerJoin(
+            schema.transactions,
+            eq(schema.journalEntries.transactionId, schema.transactions.id),
+          )
+          .innerJoin(
+            schema.accounts,
+            eq(schema.journalEntries.accountId, schema.accounts.id),
+          )
+          .where(
+            and(
+              eq(schema.transactions.ledgerId, ledgerId),
+              eq(schema.journalEntries.accountId, accountId),
+              gte(schema.transactions.date, startDate),
+              lte(schema.transactions.date, endDate),
+            ),
+          )
+          .groupBy(
+            sql`EXTRACT(MONTH FROM ${schema.transactions.date})`,
+            sql`EXTRACT(YEAR FROM ${schema.transactions.date})`,
+          )
+          .as('monthly_total'),
+      );
+
+    return {
+      average: result[0]?.average || '0',
+      stdDev: result[0]?.stdDev || '0',
+    };
+  }
 }
