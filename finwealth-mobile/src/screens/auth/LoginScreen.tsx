@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
+import { useRouter } from 'expo-router';
 import { Input } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
 import { useAuthStore } from '../../store/auth.store';
@@ -8,8 +9,9 @@ import { theme } from '../../theme/theme';
 export const LoginScreen = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const router = useRouter();
 
-  const { login, isLoading, error, setError } = useAuthStore();
+  const { login, isLoading, error, setError, isAuthenticated } = useAuthStore();
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -19,6 +21,12 @@ export const LoginScreen = () => {
 
     await login(email, password);
   };
+
+  React.useEffect(() => {
+    if (isAuthenticated) {
+      router.replace('/(tabs)');
+    }
+  }, [isAuthenticated, router]);
 
   return (
     <KeyboardAvoidingView

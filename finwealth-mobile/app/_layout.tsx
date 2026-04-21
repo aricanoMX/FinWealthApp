@@ -10,7 +10,9 @@ export default function RootLayout() {
         headerTintColor: theme.colors.text,
       }}
     >
-      <Stack.Screen name="index" options={{ title: 'Home' }} />
+      <Stack.Screen name="index" options={{ headerShown: false }} />
+      <Stack.Screen name="login" options={{ title: 'Iniciar Sesión', headerShown: false }} />
+      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
     </Stack>
   );
 }
