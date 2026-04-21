@@ -12,6 +12,14 @@ export interface CashFlowResponse {
   netCashFlow: string;
 }
 
+export interface Anomaly {
+  id: string;
+  title: string;
+  description: string;
+  type: 'spike' | 'alert';
+  date: string;
+}
+
 export const AnalyticsApi = {
   /**
    * Obtiene el patrimonio neto (Activos + Pasivos) para un ledger específico.
@@ -33,6 +41,16 @@ export const AnalyticsApi = {
   ): Promise<CashFlowResponse> => {
     const response = await apiClient.get<CashFlowResponse>('/analytics/cash-flow', {
       params: { ledgerId, startDate, endDate },
+    });
+    return response.data;
+  },
+
+  /**
+   * Obtiene las anomalías de salud financiera para un ledger específico.
+   */
+  getAnomalies: async (ledgerId: string): Promise<Anomaly[]> => {
+    const response = await apiClient.get<Anomaly[]>('/analytics/anomalies', {
+      params: { ledgerId },
     });
     return response.data;
   },

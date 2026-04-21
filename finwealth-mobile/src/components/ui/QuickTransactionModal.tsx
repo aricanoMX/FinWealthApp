@@ -57,7 +57,12 @@ export const QuickTransactionModal: React.FC<QuickTransactionModalProps> = ({
     return numAmount === 0 ? 0 : numAmount; // Si falta una cuenta, no hay balance cero.
   }, [amount, paymentAccount.id, categoryAccount.id]);
 
-  const isBalanceZero = balance === 0 && amount !== '' && parseFloat(amount) !== 0 && paymentAccount.id !== '' && categoryAccount.id !== '';
+  const isBalanceZero =
+    balance === 0 &&
+    amount !== '' &&
+    parseFloat(amount) !== 0 &&
+    paymentAccount.id !== '' &&
+    categoryAccount.id !== '';
 
   const handleSave = async () => {
     if (!isBalanceZero) return;
@@ -92,29 +97,36 @@ export const QuickTransactionModal: React.FC<QuickTransactionModalProps> = ({
     onClose();
   };
 
-  const renderSuggestions = useCallback((onSelect: (acc: { id: string; name: string }) => void, selectedId: string) => (
-    <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.suggestionsScroll}>
-      {suggestions.map((suggestion) => (
-        <TouchableOpacity
-          key={suggestion.accountId}
-          style={[
-            styles.suggestionChip,
-            selectedId === suggestion.accountId && styles.suggestionChipSelected,
-          ]}
-          onPress={() => onSelect({ id: suggestion.accountId, name: suggestion.name })}
-        >
-          <Text
+  const renderSuggestions = useCallback(
+    (onSelect: (acc: { id: string; name: string }) => void, selectedId: string) => (
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={styles.suggestionsScroll}
+      >
+        {suggestions.map((suggestion) => (
+          <TouchableOpacity
+            key={suggestion.accountId}
             style={[
-              styles.suggestionText,
-              selectedId === suggestion.accountId && styles.suggestionTextSelected,
+              styles.suggestionChip,
+              selectedId === suggestion.accountId && styles.suggestionChipSelected,
             ]}
+            onPress={() => onSelect({ id: suggestion.accountId, name: suggestion.name })}
           >
-            {suggestion.name}
-          </Text>
-        </TouchableOpacity>
-      ))}
-    </ScrollView>
-  ), [suggestions]);
+            <Text
+              style={[
+                styles.suggestionText,
+                selectedId === suggestion.accountId && styles.suggestionTextSelected,
+              ]}
+            >
+              {suggestion.name}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+    ),
+    [suggestions],
+  );
 
   return (
     <Modal visible={isVisible} transparent animationType="fade" onRequestClose={handleClose}>

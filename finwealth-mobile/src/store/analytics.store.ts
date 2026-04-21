@@ -1,24 +1,31 @@
 import { create } from 'zustand';
 import { AnalyticsApi } from '../api/analytics.api';
-import type { NetWorthResponse, CashFlowResponse } from '../api/analytics.api';
+import type { NetWorthResponse, CashFlowResponse, Anomaly } from '../api/analytics.api';
 
 interface AnalyticsState {
   netWorth: NetWorthResponse | null;
   cashFlow: CashFlowResponse | null;
+  anomalies: Anomaly[];
   isLoading: boolean;
+  isHealthLoading: boolean;
   error: string | null;
+  healthError: string | null;
 
   // Actions
   fetchNetWorth: (ledgerId: string, date?: string) => Promise<void>;
   fetchCashFlow: (ledgerId: string, startDate: string, endDate: string) => Promise<void>;
+  fetchAnomalies: (ledgerId: string) => Promise<void>;
   reset: () => void;
 }
 
 export const useAnalyticsStore = create<AnalyticsState>((set) => ({
   netWorth: null,
   cashFlow: null,
+  anomalies: [],
   isLoading: false,
+  isHealthLoading: false,
   error: null,
+  healthError: null,
 
   fetchNetWorth: async (ledgerId, date) => {
     set({ isLoading: true, error: null });
@@ -46,11 +53,27 @@ export const useAnalyticsStore = create<AnalyticsState>((set) => ({
     }
   },
 
+  fetchAnomalies: async (ledgerId) => {
+    set({ isHealthLoading: true, healthError: null });
+    try {
+      const data = await AnalyticsApi.getAnomalies(ledgerId);
+      set({ anomalies: data, isHealthLoading: false });
+    } catch (err: any) {
+      set({
+        healthError: err.message || 'Error al obtener anomalías',
+        isHealthLoading: false,
+      });
+    }
+  },
+
   reset: () =>
     set({
       netWorth: null,
       cashFlow: null,
+      anomalies: [],
       isLoading: false,
+      isHealthLoading: false,
       error: null,
+      healthError: null,
     }),
 }));

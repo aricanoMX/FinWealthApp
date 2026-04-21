@@ -23,7 +23,10 @@ export const useBudgetsStore = create<BudgetsState>((set) => ({
       set({ budgetsPerformance: data, isLoading: false });
     } catch (err: any) {
       set({
-        error: err.response?.data?.message || err.message || 'Error al obtener el desempeño de presupuestos',
+        error:
+          err.response?.data?.message ||
+          err.message ||
+          'Error al obtener el desempeño de presupuestos',
         isLoading: false,
       });
     }

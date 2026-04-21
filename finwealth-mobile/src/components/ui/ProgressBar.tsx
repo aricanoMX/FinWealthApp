@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { theme } from '../../theme/theme';
 
 interface ProgressBarProps {
@@ -64,14 +64,14 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    marginVertical: theme.spacing.12,
+    marginVertical: theme.spacing[12],
     width: '100%',
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: theme.spacing.8,
+    marginBottom: theme.spacing[8],
   },
   label: {
     color: theme.colors.text,
@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   footer: {
-    marginTop: theme.spacing.4,
+    marginTop: theme.spacing[4],
     alignItems: 'flex-end',
   },
   amount: {

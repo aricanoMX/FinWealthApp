@@ -1,12 +1,5 @@
 import React, { useEffect, useCallback } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
-  RefreshControl,
-  ActivityIndicator,
-} from 'react-native';
+import { View, Text, StyleSheet, FlatList, RefreshControl, ActivityIndicator } from 'react-native';
 import { theme } from '../../src/theme/theme';
 import FadeInView from '../../src/components/ui/FadeInView';
 import ProgressBar from '../../src/components/ui/ProgressBar';
@@ -21,7 +14,7 @@ export default function BudgetsScreen() {
 
   const fetchData = useCallback(async () => {
     if (!isAuthenticated) return;
-    
+
     const now = new Date();
     const month = now.getMonth() + 1; // 1-12
     const year = now.getFullYear();
@@ -36,7 +29,9 @@ export default function BudgetsScreen() {
   const renderItem = ({ item }: { item: any }) => (
     <View style={styles.budgetItem}>
       <ProgressBar
-        label={item.category || (item.accountId ? `Cuenta: ${item.accountId}` : 'Presupuesto Global')}
+        label={
+          item.category || (item.accountId ? `Cuenta: ${item.accountId}` : 'Presupuesto Global')
+        }
         progress={item.percentage}
         spent={item.amountSpent}
         limit={item.amountLimit}

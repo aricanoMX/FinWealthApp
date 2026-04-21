@@ -13,6 +13,7 @@ import FadeInView from '../../src/components/ui/FadeInView';
 import { useAnalyticsStore } from '../../src/store/analytics.store';
 import { useAuthStore } from '../../src/store/auth.store';
 import { QuickTransactionModal } from '../../src/components/ui/QuickTransactionModal';
+import HealthCard from '../../src/components/ui/HealthCard';
 
 const currencyFormatter = new Intl.NumberFormat('en-US', {
   style: 'currency',
@@ -29,8 +30,18 @@ const LEDGER_ID = 'default-ledger';
 
 export default function DashboardScreen() {
   const { user, isAuthenticated } = useAuthStore();
-  const { netWorth, cashFlow, isLoading, error, fetchNetWorth, fetchCashFlow } =
-    useAnalyticsStore();
+  const {
+    netWorth,
+    cashFlow,
+    anomalies,
+    isLoading,
+    isHealthLoading,
+    error,
+    healthError,
+    fetchNetWorth,
+    fetchCashFlow,
+    fetchAnomalies,
+  } = useAnalyticsStore();
   const [isModalVisible, setIsModalVisible] = useState(false);
 
   const fetchData = useCallback(async () => {
@@ -40,8 +51,12 @@ export default function DashboardScreen() {
     const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
     const today = now.toISOString().split('T')[0];
 
-    await Promise.all([fetchNetWorth(LEDGER_ID), fetchCashFlow(LEDGER_ID, firstDay, today)]);
-  }, [isAuthenticated, fetchNetWorth, fetchCashFlow]);
+    await Promise.all([
+      fetchNetWorth(LEDGER_ID),
+      fetchCashFlow(LEDGER_ID, firstDay, today),
+      fetchAnomalies(LEDGER_ID),
+    ]);
+  }, [isAuthenticated, fetchNetWorth, fetchCashFlow, fetchAnomalies]);
 
   useEffect(() => {
     fetchData();
@@ -132,6 +147,33 @@ export default function DashboardScreen() {
               </Text>
             </View>
           </View>
+
+          {/* Financial Health Feed */}
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Salud Financiera</Text>
+            {isHealthLoading && <ActivityIndicator size="small" color={theme.colors.primary} />}
+          </View>
+
+          {healthError && (
+            <Text style={[styles.errorText, { marginBottom: 16 }]}>{healthError}</Text>
+          )}
+
+          {anomalies.length > 0
+            ? anomalies.map((anomaly) => (
+                <HealthCard
+                  key={anomaly.id}
+                  title={anomaly.title}
+                  description={anomaly.description}
+                  type={anomaly.type}
+                />
+              ))
+            : !isHealthLoading && (
+                <FadeInView style={styles.successCard}>
+                  <View style={styles.successRow}>
+                    <Text style={styles.successMessage}>✨ Tu salud financiera se ve bien</Text>
+                  </View>
+                </FadeInView>
+              )}
 
           {isLoading && !netWorth && !cashFlow && (
             <ActivityIndicator size="large" color={theme.colors.primary} style={styles.loader} />
@@ -265,6 +307,36 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 10,
   },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: theme.spacing[16],
+    marginTop: theme.spacing[8],
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: theme.colors.text,
+  },
+  successCard: {
+    backgroundColor: 'rgba(0, 255, 65, 0.05)',
+    borderRadius: 16,
+    padding: theme.spacing[16],
+    borderWidth: 1,
+    borderColor: 'rgba(0, 255, 65, 0.1)',
+    marginBottom: theme.spacing[24],
+  },
+  successRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  successMessage: {
+    color: theme.colors.secondary,
+    fontSize: 15,
+    fontWeight: '600',
+  },
   fab: {
     position: 'absolute',
     right: theme.spacing[24],
@@ -288,4 +360,3 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 });
-

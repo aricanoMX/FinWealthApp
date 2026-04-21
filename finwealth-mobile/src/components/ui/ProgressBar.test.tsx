@@ -5,13 +5,7 @@ import ProgressBar from './ProgressBar';
 describe('ProgressBar', () => {
   it('renders correctly with 50% progress', () => {
     const { getByText } = render(
-      <ProgressBar
-        label="Comida"
-        progress={50}
-        spent={500}
-        limit={1000}
-        currency="USD"
-      />
+      <ProgressBar label="Comida" progress={50} spent={500} limit={1000} currency="USD" />,
     );
 
     expect(getByText('Comida')).toBeTruthy();
@@ -22,13 +16,7 @@ describe('ProgressBar', () => {
 
   it('renders correctly with 110% progress', () => {
     const { getByText } = render(
-      <ProgressBar
-        label="Ocio"
-        progress={110}
-        spent={1100}
-        limit={1000}
-        currency="USD"
-      />
+      <ProgressBar label="Ocio" progress={110} spent={1100} limit={1000} currency="USD" />,
     );
 
     expect(getByText('110%')).toBeTruthy();
