@@ -1,0 +1,86 @@
+name: Elite CI/CD Pipeline (Zero-Tolerance)
+
+on:
+  push:
+    branches: [ "main", "develop" ]
+  pull_request:
+    branches: [ "main", "develop" ]
+
+jobs:
+  validate-infra:
+    name: Validate Infrastructure
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: 'finwealth-infra/package-lock.json'
+
+      - name: Install dependencies
+        working-directory: ./finwealth-infra
+        run: npm ci
+
+      - name: Strict Compilation Check
+        working-directory: ./finwealth-infra
+        run: npx tsc --noEmit
+
+      - name: Linter Check
+        working-directory: ./finwealth-infra
+        run: npm run lint --if-present
+
+      - name: Unit Tests
+        working-directory: ./finwealth-infra
+        run: npm run test --if-present
+
+  validate-backend:
+    name: Validate Backend
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: 'finwealth-backend/package-lock.json'
+
+      - name: Install dependencies
+        working-directory: ./finwealth-backend
+        run: npm ci
+
+      - name: Strict Compilation Check
+        working-directory: ./finwealth-backend
+        run: npx tsc --noEmit
+
+      - name: Linter Check
+        working-directory: ./finwealth-backend
+        run: npm run lint
+
+      - name: Unit Tests
+        working-directory: ./finwealth-backend
+        run: npm run test
+
+      - name: E2E Tests
+        working-directory: ./finwealth-backend
+        run: npm run test:e2e
+
+      - name: SRP Guardian (Max 300 lines limit)
+        working-directory: ./finwealth-backend
+        run: |
+          echo "Scanning src/ for files exceeding 300 lines..."
+          VIOLATIONS=$(find src -name "*.ts" -type f -exec wc -l {} + | awk '$1 > 300 && $2 != "total"')
+          
+          if [ -n "$VIOLATIONS" ]; then
+            echo "❌ Violación de SRP: Los siguientes archivos superan las 300 líneas:"
+            echo "$VIOLATIONS"
+            exit 1
+          else
+            echo "✅ Todos los archivos dentro del límite de 300 líneas. SRP mantenido."
+          fi
