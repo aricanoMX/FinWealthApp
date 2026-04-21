@@ -84,7 +84,7 @@ export const QuickTransactionModal: React.FC<QuickTransactionModalProps> = ({
         ],
       });
       handleClose();
-    } catch (error) {
+    } catch {
       // Error is handled by store
     }
   };

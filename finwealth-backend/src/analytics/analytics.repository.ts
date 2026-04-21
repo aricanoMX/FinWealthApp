@@ -130,7 +130,9 @@ export class AnalyticsRepository {
       .from(
         this.db
           .select({
-            total: sql<number>`SUM(${schema.journalEntries.amount})`.as('total'),
+            total: sql<number>`SUM(${schema.journalEntries.amount})`.as(
+              'total',
+            ),
           })
           .from(schema.journalEntries)
           .innerJoin(

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/unbound-method */
 import { Test, TestingModule } from '@nestjs/testing';
 import { BudgetsService } from './budgets.service';
 import { BudgetsRepository } from './budgets.repository';
@@ -6,8 +7,14 @@ import { ForbiddenException } from '@nestjs/common';
 
 describe('BudgetsService', () => {
   let service: BudgetsService;
-  let repository: BudgetsRepository;
-  let db: any;
+  let repository: jest.Mocked<BudgetsRepository>;
+  let db: {
+    query: {
+      ledgers: {
+        findFirst: jest.Mock;
+      };
+    };
+  };
 
   beforeEach(async () => {
     const mockRepository = {
@@ -32,7 +39,9 @@ describe('BudgetsService', () => {
     }).compile();
 
     service = module.get<BudgetsService>(BudgetsService);
-    repository = module.get<BudgetsRepository>(BudgetsRepository);
+    repository = module.get<BudgetsRepository>(
+      BudgetsRepository,
+    ) as jest.Mocked<BudgetsRepository>;
     db = module.get(DATABASE_CONNECTION);
   });
 

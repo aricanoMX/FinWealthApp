@@ -43,7 +43,10 @@ describe('TransactionsService', () => {
       ];
       repository.getMostUsedAccounts.mockResolvedValue(suggestions);
 
-      const result = await service.getAccountSuggestions('ledger-1', 'user-123');
+      const result = await service.getAccountSuggestions(
+        'ledger-1',
+        'user-123',
+      );
 
       expect(repository.getMostUsedAccounts).toHaveBeenCalledWith('ledger-1');
       expect(result).toEqual(suggestions);

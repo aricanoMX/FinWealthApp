@@ -10,16 +10,15 @@ describe('<Home />', () => {
 
   it('renders correctly initially with uninitialized state', () => {
     render(<Home />);
-    expect(screen.getByText('FinWealth App is initializing...')).toBeTruthy();
+    expect(screen.getByText('Inicializando el motor de riqueza...')).toBeTruthy();
   });
 
-  it('updates text when initialized button is pressed', () => {
+  it('updates state when initialized button is pressed', () => {
     render(<Home />);
 
-    // Simulate user or system initializing the app
-    const button = screen.getByText('Initialize');
+    const button = screen.getByText('Comenzar Experiencia Elite');
     fireEvent.press(button);
 
-    expect(screen.getByText('FinWealth App is Ready!')).toBeTruthy();
+    expect(useAppStore.getState().isInitialized).toBe(true);
   });
 });

@@ -80,7 +80,8 @@ export class AnalyticsController {
   @Get('health/anomalies')
   @ApiOperation({
     summary: 'Detect spending anomalies compared to historical average',
-    description: 'Compares current month spending with the previous 6 months baseline using standard deviation and percentage thresholds.',
+    description:
+      'Compares current month spending with the previous 6 months baseline using standard deviation and percentage thresholds.',
   })
   @ApiQuery({ name: 'ledgerId', required: true, type: String })
   @ApiResponse({

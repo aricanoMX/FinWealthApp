@@ -58,7 +58,7 @@ export class AnalyticsService {
       diffPercentage: number;
     }[] = [];
 
-    for (const [_, data] of accountMap.entries()) {
+    for (const data of accountMap.values()) {
       if (data.historicalTotals.length === 0) continue;
 
       const sum = data.historicalTotals.reduce((a, b) => a + b, 0);

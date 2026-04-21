@@ -154,9 +154,7 @@ export default function DashboardScreen() {
             {isHealthLoading && <ActivityIndicator size="small" color={theme.colors.primary} />}
           </View>
 
-          {healthError && (
-            <Text style={[styles.errorText, { marginBottom: 16 }]}>{healthError}</Text>
-          )}
+          {healthError && <Text style={styles.errorTextWithMargin}>{healthError}</Text>}
 
           {anomalies.length > 0
             ? anomalies.map((anomaly) => (
@@ -306,6 +304,13 @@ const styles = StyleSheet.create({
     fontSize: 14,
     textAlign: 'center',
     marginTop: 10,
+  },
+  errorTextWithMargin: {
+    color: theme.colors.error,
+    fontSize: 14,
+    textAlign: 'center',
+    marginTop: 10,
+    marginBottom: theme.spacing[16],
   },
   sectionHeader: {
     flexDirection: 'row',
