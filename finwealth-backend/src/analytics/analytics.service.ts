@@ -8,4 +8,8 @@ export class AnalyticsService {
   async getNetWorth(ledgerId: string, date?: Date) {
     return this.analyticsRepository.getNetWorth(ledgerId, date);
   }
+
+  async getCashFlow(ledgerId: string, startDate: Date, endDate: Date) {
+    return this.analyticsRepository.getCashFlow(ledgerId, startDate, endDate);
+  }
 }

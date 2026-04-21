@@ -7,8 +7,6 @@ import {
   ApiQuery,
 } from '@nestjs/swagger';
 import { AnalyticsService } from './analytics.service';
-import { CurrentUser } from '../auth/decorators/current-user.decorator';
-import type { UserPayload } from '../auth/decorators/current-user.decorator';
 
 @ApiTags('Analytics')
 @ApiBearerAuth()
@@ -40,9 +38,42 @@ export class AnalyticsController {
   async getNetWorth(
     @Query('ledgerId', ParseUUIDPipe) ledgerId: string,
     @Query('date') date?: string,
-    @CurrentUser() _user: UserPayload,
   ) {
     const calculationDate = date ? new Date(date) : undefined;
     return this.analyticsService.getNetWorth(ledgerId, calculationDate);
+  }
+
+  @Get('cash-flow')
+  @ApiOperation({
+    summary: 'Calculate cash flow (Income vs Expenses) for a specific period',
+  })
+  @ApiQuery({ name: 'ledgerId', required: true, type: String })
+  @ApiQuery({ name: 'startDate', required: true, type: Date })
+  @ApiQuery({ name: 'endDate', required: true, type: Date })
+  @ApiResponse({
+    status: 200,
+    description: 'The cash flow has been successfully calculated.',
+    schema: {
+      example: {
+        income: '5000.00',
+        expenses: '3500.00',
+        netCashFlow: '1500.00',
+      },
+    },
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized. JWT token missing or invalid.',
+  })
+  async getCashFlow(
+    @Query('ledgerId', ParseUUIDPipe) ledgerId: string,
+    @Query('startDate') startDate: string,
+    @Query('endDate') endDate: string,
+  ) {
+    return this.analyticsService.getCashFlow(
+      ledgerId,
+      new Date(startDate),
+      new Date(endDate),
+    );
   }
 }

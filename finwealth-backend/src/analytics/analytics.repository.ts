@@ -2,7 +2,8 @@ import { Injectable, Inject } from '@nestjs/common';
 import { DATABASE_CONNECTION } from '../core/database/database.module';
 import { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import * as schema from 'finwealth-infra/src/schema';
-import { eq, and, lte, sql, inArray, SQL } from 'drizzle-orm';
+import { eq, and, lte, gte, sql, inArray, SQL } from 'drizzle-orm';
+import Decimal from 'decimal.js';
 
 @Injectable()
 export class AnalyticsRepository {
@@ -41,5 +42,38 @@ export class AnalyticsRepository {
       .where(and(...filters));
 
     return result[0];
+  }
+
+  async getCashFlow(ledgerId: string, startDate: Date, endDate: Date) {
+    const filters: (SQL | undefined)[] = [
+      eq(schema.transactions.ledgerId, ledgerId),
+      gte(schema.transactions.date, startDate),
+      lte(schema.transactions.date, endDate),
+    ];
+
+    const result = await this.db
+      .select({
+        income: sql<string>`COALESCE(SUM(CASE WHEN ${schema.accounts.type} = 'revenue' THEN -${schema.journalEntries.amount} ELSE 0 END), 0)::TEXT`,
+        expenses: sql<string>`COALESCE(SUM(CASE WHEN ${schema.accounts.type} = 'expense' THEN ${schema.journalEntries.amount} ELSE 0 END), 0)::TEXT`,
+      })
+      .from(schema.journalEntries)
+      .innerJoin(
+        schema.transactions,
+        eq(schema.journalEntries.transactionId, schema.transactions.id),
+      )
+      .innerJoin(
+        schema.accounts,
+        eq(schema.journalEntries.accountId, schema.accounts.id),
+      )
+      .where(and(...filters));
+
+    const { income, expenses } = result[0];
+    const netCashFlow = new Decimal(income).minus(expenses).toFixed(2);
+
+    return {
+      income: new Decimal(income).toFixed(2),
+      expenses: new Decimal(expenses).toFixed(2),
+      netCashFlow,
+    };
   }
 }
