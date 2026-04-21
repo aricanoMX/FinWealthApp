@@ -31,7 +31,9 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       ) {
         const responseObj = exceptionResponse as {
           message?: string | string[];
+          code?: string;
         };
+        code = responseObj.code || 'HTTP_EXCEPTION';
         message = Array.isArray(responseObj.message)
           ? responseObj.message.join(', ')
           : responseObj.message || exception.message;
