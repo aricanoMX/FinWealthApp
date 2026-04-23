@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { LoggerModule } from 'nestjs-pino';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -12,6 +12,7 @@ import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { HealthModule } from './core/health/health.module';
 import { AnalyticsModule } from './analytics/analytics.module';
 import { BudgetsModule } from './budgets/budgets.module';
+import { LoggingInterceptor } from './core/interceptors/logging.interceptor';
 
 @Module({
   imports: [
@@ -40,6 +41,10 @@ import { BudgetsModule } from './budgets/budgets.module';
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: LoggingInterceptor,
     },
   ],
 })
