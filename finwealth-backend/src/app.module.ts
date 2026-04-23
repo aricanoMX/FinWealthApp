@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
+import { LoggerModule } from 'nestjs-pino';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { validateEnv } from './core/config/env.validation';
@@ -17,6 +18,14 @@ import { BudgetsModule } from './budgets/budgets.module';
     ConfigModule.forRoot({
       isGlobal: true, // Make configuration available globally
       validate: validateEnv, // Use our Zod strict validation function
+    }),
+    LoggerModule.forRoot({
+      pinoHttp: {
+        transport:
+          process.env.NODE_ENV !== 'production'
+            ? { target: 'pino-pretty' }
+            : undefined,
+      },
     }),
     DatabaseModule,
     TransactionsModule,

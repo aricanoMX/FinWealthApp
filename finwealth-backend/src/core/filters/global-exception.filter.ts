@@ -4,11 +4,14 @@ import {
   ArgumentsHost,
   HttpException,
   HttpStatus,
+  Logger,
 } from '@nestjs/common';
 import { Response } from 'express';
 
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {
+  private readonly logger = new Logger(GlobalExceptionFilter.name);
+
   catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
@@ -42,8 +45,14 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       }
     } else if (exception instanceof Error) {
       message = exception.message;
+      this.logger.error(
+        `Unhandled Exception: ${exception.message}`,
+        exception.stack,
+      );
       // You could map specific custom errors to specific codes here
       // For now, we capture the error message but keep it as internal
+    } else {
+      this.logger.error(`Unhandled Exception: ${String(exception)}`);
     }
 
     response.status(status).json({
