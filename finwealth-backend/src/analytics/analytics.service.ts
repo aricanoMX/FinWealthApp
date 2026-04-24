@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { AnalyticsRepository } from './analytics.repository';
+import { parse } from 'json2csv';
 
 @Injectable()
 export class AnalyticsService {
@@ -105,5 +106,19 @@ export class AnalyticsService {
     }
 
     return anomalies;
+  }
+
+  async exportToCsv(ledgerId: string, startDate?: Date, endDate?: Date) {
+    const data = await this.analyticsRepository.getExportData(
+      ledgerId,
+      startDate,
+      endDate,
+    );
+
+    if (!data || data.length === 0) {
+      return '';
+    }
+
+    return parse(data);
   }
 }

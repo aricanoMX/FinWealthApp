@@ -1,4 +1,4 @@
-import { Controller, Get, Query, ParseUUIDPipe } from '@nestjs/common';
+import { Controller, Get, Query, ParseUUIDPipe, Header } from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
@@ -105,5 +105,40 @@ export class AnalyticsController {
   })
   async detectAnomalies(@Query('ledgerId', ParseUUIDPipe) ledgerId: string) {
     return this.analyticsService.detectAnomalies(ledgerId);
+  }
+
+  @Get('export')
+  @Header('Content-Type', 'text/csv')
+  @Header('Content-Disposition', 'attachment; filename="report.csv"')
+  @ApiOperation({
+    summary: 'Export transactions to CSV for a specific ledger',
+  })
+  @ApiQuery({ name: 'ledgerId', required: true, type: String })
+  @ApiQuery({ name: 'startDate', required: false, type: Date })
+  @ApiQuery({ name: 'endDate', required: false, type: Date })
+  @ApiResponse({
+    status: 200,
+    description: 'The CSV file has been successfully generated.',
+    content: {
+      'text/csv': {
+        schema: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized. JWT token missing or invalid.',
+  })
+  async exportToCsv(
+    @Query('ledgerId', ParseUUIDPipe) ledgerId: string,
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
+  ) {
+    const sDate = startDate ? new Date(startDate) : undefined;
+    const eDate = endDate ? new Date(endDate) : undefined;
+    return this.analyticsService.exportToCsv(ledgerId, sDate, eDate);
   }
 }

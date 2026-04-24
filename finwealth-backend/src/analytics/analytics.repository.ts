@@ -163,4 +163,43 @@ export class AnalyticsRepository {
       stdDev: result[0]?.stdDev || '0',
     };
   }
+
+  async getExportData(ledgerId: string, startDate?: Date, endDate?: Date) {
+    const filters: (SQL | undefined)[] = [
+      eq(schema.transactions.ledgerId, ledgerId),
+    ];
+
+    if (startDate) {
+      filters.push(gte(schema.transactions.date, startDate));
+    }
+    if (endDate) {
+      filters.push(lte(schema.transactions.date, endDate));
+    }
+
+    return this.db
+      .select({
+        transactionId: schema.transactions.id,
+        date: schema.transactions.date,
+        description: schema.transactions.description,
+        accountId: schema.accounts.id,
+        accountName: schema.accounts.name,
+        accountType: schema.accounts.type,
+        amount: schema.journalEntries.amount,
+        isDeductible: schema.journalEntries.isDeductible,
+        taxAmount: schema.journalEntries.taxAmount,
+        transactionMetadata: schema.transactions.metadata,
+        journalMetadata: schema.journalEntries.metadata,
+      })
+      .from(schema.journalEntries)
+      .innerJoin(
+        schema.transactions,
+        eq(schema.journalEntries.transactionId, schema.transactions.id),
+      )
+      .innerJoin(
+        schema.accounts,
+        eq(schema.journalEntries.accountId, schema.accounts.id),
+      )
+      .where(and(...filters))
+      .orderBy(schema.transactions.date);
+  }
 }
