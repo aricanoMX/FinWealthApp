@@ -3,6 +3,7 @@ import { DATABASE_CONNECTION } from '../core/database/database.module';
 import { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import * as schema from 'finwealth-infra/src/schema';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
+import { UpdateTransactionDto } from './dto/update-transaction.dto';
 import { eq, sql, desc, and, gte, lte, inArray } from 'drizzle-orm';
 
 @Injectable()
@@ -11,6 +12,87 @@ export class TransactionsRepository {
     @Inject(DATABASE_CONNECTION)
     private readonly db: PostgresJsDatabase<typeof schema>,
   ) {}
+
+  /**
+   * Verifies if a transaction belongs to a given user.
+   */
+  async verifyTransactionOwnership(
+    transactionId: string,
+    userId: string,
+  ): Promise<boolean> {
+    const result = await this.db
+      .select({ id: schema.transactions.id })
+      .from(schema.transactions)
+      .innerJoin(
+        schema.ledgers,
+        eq(schema.ledgers.id, schema.transactions.ledgerId),
+      )
+      .where(
+        and(
+          eq(schema.transactions.id, transactionId),
+          eq(schema.ledgers.userId, userId),
+        ),
+      )
+      .limit(1);
+
+    return result.length > 0;
+  }
+
+  /**
+   * Updates a transaction and its journal entries atomically.
+   */
+  async updateTransaction(
+    id: string,
+    data: UpdateTransactionDto,
+  ): Promise<string> {
+    return this.db.transaction(async (tx) => {
+      // 1. Update Transaction (if fields are provided)
+      type TransactionUpdate = Partial<{
+        ledgerId: string;
+        date: Date;
+        description: string;
+        rawData: unknown;
+        receiptUrl: string;
+      }>;
+      const updateData: TransactionUpdate = {};
+      if (data.ledgerId !== undefined) updateData.ledgerId = data.ledgerId;
+      if (data.date !== undefined) updateData.date = new Date(data.date);
+      if (data.description !== undefined)
+        updateData.description = data.description;
+      if (data.rawData !== undefined)
+        updateData.rawData = data.rawData as unknown;
+      if (data.receiptUrl !== undefined)
+        updateData.receiptUrl = data.receiptUrl;
+
+      if (Object.keys(updateData).length > 0) {
+        await tx
+          .update(schema.transactions)
+          .set({ ...updateData, updatedAt: new Date() })
+          .where(eq(schema.transactions.id, id));
+      }
+
+      // 2. Update Journal Entries (if provided)
+      if (data.entries) {
+        // Delete old entries
+        await tx
+          .delete(schema.journalEntries)
+          .where(eq(schema.journalEntries.transactionId, id));
+
+        // Insert new entries
+        const entriesToInsert = data.entries.map((entry) => ({
+          transactionId: id,
+          accountId: entry.accountId,
+          amount: entry.amount,
+          isDeductible: entry.isDeductible ?? false,
+          taxAmount: entry.taxAmount,
+        }));
+
+        await tx.insert(schema.journalEntries).values(entriesToInsert);
+      }
+
+      return id;
+    });
+  }
 
   /**
    * Persists a transaction and its journal entries atomically.

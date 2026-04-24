@@ -1,5 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
+import { UpdateTransactionDto } from './dto/update-transaction.dto';
 import { TransactionsRepository } from './transactions.repository';
 import { DoubleEntryService } from '../cpa-engine/double-entry.service';
 
@@ -9,6 +10,41 @@ export class TransactionsService {
     private readonly repository: TransactionsRepository,
     private readonly doubleEntryService: DoubleEntryService,
   ) {}
+
+  /**
+   * Updates a transaction request, ensuring double-entry constraints.
+   */
+  async updateTransaction(
+    id: string,
+    updateDto: UpdateTransactionDto,
+    userId: string,
+  ): Promise<{ id: string }> {
+    // 1. Verify ownership
+    const isOwner = await this.repository.verifyTransactionOwnership(
+      id,
+      userId,
+    );
+    if (!isOwner) {
+      throw new NotFoundException(
+        `Transaction with ID ${id} not found or you don't have permission to modify it.`,
+      );
+    }
+
+    // 2. Math constraint if entries are updated
+    if (updateDto.entries) {
+      this.doubleEntryService.validateTransactionBalance(
+        updateDto.entries.map((entry) => ({
+          accountId: entry.accountId,
+          amount: entry.amount,
+        })),
+      );
+    }
+
+    // 3. Delegate to repository
+    await this.repository.updateTransaction(id, updateDto);
+
+    return { id };
+  }
 
   /**
    * Processes a transaction request, ensuring double-entry constraints.

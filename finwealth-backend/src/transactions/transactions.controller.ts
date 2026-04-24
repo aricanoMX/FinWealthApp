@@ -1,6 +1,8 @@
 import {
   Controller,
   Post,
+  Patch,
+  Param,
   Body,
   HttpCode,
   HttpStatus,
@@ -8,6 +10,7 @@ import {
   Query,
   DefaultValuePipe,
   ParseIntPipe,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -18,6 +21,7 @@ import {
 } from '@nestjs/swagger';
 import { TransactionsService } from './transactions.service';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
+import { UpdateTransactionDto } from './dto/update-transaction.dto';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import type { UserPayload } from '../auth/decorators/current-user.decorator';
 
@@ -57,6 +61,42 @@ export class TransactionsController {
     // user.userId contains the Supabase user ID
     const result = await this.transactionsService.createTransaction(
       createTransactionDto,
+      user.userId,
+    );
+    return {
+      success: true,
+      data: result,
+    };
+  }
+
+  @Patch(':id')
+  @ApiOperation({
+    summary: 'Update an existing financial transaction',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'The transaction has been successfully updated.',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Double-entry violation or invalid payload.',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized. JWT token missing or invalid.',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Transaction not found or not owned by user.',
+  })
+  async update(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() updateTransactionDto: UpdateTransactionDto,
+    @CurrentUser() user: UserPayload,
+  ) {
+    const result = await this.transactionsService.updateTransaction(
+      id,
+      updateTransactionDto,
       user.userId,
     );
     return {
