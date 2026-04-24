@@ -6,6 +6,8 @@ import {
   HttpStatus,
   Get,
   Query,
+  DefaultValuePipe,
+  ParseIntPipe,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -60,6 +62,62 @@ export class TransactionsController {
     return {
       success: true,
       data: result,
+    };
+  }
+
+  @Get()
+  @ApiOperation({
+    summary: 'Get paginated transactions with optional date filters',
+  })
+  @ApiQuery({ name: 'ledgerId', type: 'string', required: true })
+  @ApiQuery({ name: 'limit', type: 'number', required: false, example: 20 })
+  @ApiQuery({ name: 'offset', type: 'number', required: false, example: 0 })
+  @ApiQuery({
+    name: 'startDate',
+    type: 'string',
+    required: false,
+    example: '2023-01-01',
+  })
+  @ApiQuery({
+    name: 'endDate',
+    type: 'string',
+    required: false,
+    example: '2023-12-31',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Paginated list of transactions.',
+    schema: {
+      example: {
+        success: true,
+        data: [],
+        total: 0,
+      },
+    },
+  })
+  async getTransactions(
+    @Query('ledgerId') ledgerId: string,
+    @Query('limit', new DefaultValuePipe(20), ParseIntPipe) limit: number,
+    @Query('offset', new DefaultValuePipe(0), ParseIntPipe) offset: number,
+    @CurrentUser() user: UserPayload,
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
+  ) {
+    const parsedStartDate = startDate ? new Date(startDate) : undefined;
+    const parsedEndDate = endDate ? new Date(endDate) : undefined;
+
+    const result = await this.transactionsService.getTransactions(
+      ledgerId,
+      limit,
+      offset,
+      parsedStartDate,
+      parsedEndDate,
+    );
+
+    return {
+      success: true,
+      data: result.data,
+      total: result.total,
     };
   }
 

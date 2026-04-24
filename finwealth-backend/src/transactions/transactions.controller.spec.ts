@@ -12,6 +12,7 @@ describe('TransactionsController', () => {
     const mockService = {
       createTransaction: jest.fn(),
       getAccountSuggestions: jest.fn(),
+      getTransactions: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -44,6 +45,35 @@ describe('TransactionsController', () => {
       expect(result).toEqual({
         success: true,
         data: suggestions,
+      });
+    });
+  });
+
+  describe('getTransactions', () => {
+    it('should return paginated transactions from the service', async () => {
+      const transactions = [{ id: 'tx-1', description: 'Test' }];
+      const total = 1;
+      const user = { userId: 'user-123', email: 'test@test.com' };
+      const ledgerId = 'ledger-1';
+
+      service.getTransactions.mockResolvedValue({
+        data: transactions,
+        total,
+      } as never);
+
+      const result = await controller.getTransactions(ledgerId, 20, 0, user);
+
+      expect(service.getTransactions).toHaveBeenCalledWith(
+        ledgerId,
+        20,
+        0,
+        undefined,
+        undefined,
+      );
+      expect(result).toEqual({
+        success: true,
+        data: transactions,
+        total,
       });
     });
   });

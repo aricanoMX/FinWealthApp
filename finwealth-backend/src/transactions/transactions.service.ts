@@ -35,6 +35,30 @@ export class TransactionsService {
   }
 
   /**
+   * Retrieves paginated transactions with optional date filters.
+   */
+  async getTransactions(
+    ledgerId: string,
+    limit: number,
+    offset: number,
+    startDate?: Date,
+    endDate?: Date,
+  ) {
+    const [data, total] = await Promise.all([
+      this.repository.getTransactions(
+        ledgerId,
+        limit,
+        offset,
+        startDate,
+        endDate,
+      ),
+      this.repository.countTransactions(ledgerId, startDate, endDate),
+    ]);
+
+    return { data, total };
+  }
+
+  /**
    * Returns most used accounts for a ledger as suggestions.
    */
   async getAccountSuggestions(

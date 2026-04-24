@@ -16,6 +16,8 @@ describe('TransactionsService', () => {
       createWithEntries: jest.fn(),
       getGlobalBalance: jest.fn(),
       getMostUsedAccounts: jest.fn(),
+      getTransactions: jest.fn(),
+      countTransactions: jest.fn(),
     };
 
     const mockDoubleEntryService = {
@@ -50,6 +52,32 @@ describe('TransactionsService', () => {
 
       expect(repository.getMostUsedAccounts).toHaveBeenCalledWith('ledger-1');
       expect(result).toEqual(suggestions);
+    });
+  });
+
+  describe('getTransactions', () => {
+    it('should return paginated transactions and total count', async () => {
+      const mockTransactions = [{ id: 'tx-1', description: 'Test' }] as any[];
+      const mockTotal = 1;
+
+      repository.getTransactions.mockResolvedValue(mockTransactions);
+      repository.countTransactions.mockResolvedValue(mockTotal);
+
+      const result = await service.getTransactions('ledger-1', 10, 0);
+
+      expect(repository.getTransactions).toHaveBeenCalledWith(
+        'ledger-1',
+        10,
+        0,
+        undefined,
+        undefined,
+      );
+      expect(repository.countTransactions).toHaveBeenCalledWith(
+        'ledger-1',
+        undefined,
+        undefined,
+      );
+      expect(result).toEqual({ data: mockTransactions, total: mockTotal });
     });
   });
 
