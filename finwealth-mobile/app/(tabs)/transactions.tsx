@@ -15,6 +15,7 @@ import * as Sharing from 'expo-sharing';
 import { theme } from '../../src/theme/theme';
 import { useTransactionsStore } from '../../src/store/transactions.store';
 import { SessionService } from '../../src/auth/session.service';
+import type { Transaction, TransactionEntry } from '../../src/api/transactions.api';
 
 const LEDGER_ID = 'default-ledger'; // Used across tabs currently
 
@@ -40,7 +41,7 @@ export default function TransactionsScreen() {
       const token = await SessionService.getToken();
       const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000';
       const url = `${API_URL}/api/v1/analytics/export?ledgerId=${LEDGER_ID}`;
-      const fileUri = `${FileSystem.documentDirectory}transacciones.csv`;
+      const fileUri = `${(FileSystem as any).documentDirectory || ''}transacciones.csv`;
 
       const downloadRes = await FileSystem.downloadAsync(url, fileUri, {
         headers: {
@@ -78,11 +79,11 @@ export default function TransactionsScreen() {
     });
   }, [navigation, renderHeaderRight]);
 
-  const renderItem = ({ item }: { item: any }) => {
+  const renderItem = ({ item }: { item: Transaction }) => {
     const amount =
       item.entries
-        ?.filter((e: any) => parseFloat(e.amount) > 0)
-        .reduce((acc: number, e: any) => acc + parseFloat(e.amount), 0) || 0;
+        ?.filter((e: TransactionEntry) => parseFloat(e.amount) > 0)
+        .reduce((acc: number, e: TransactionEntry) => acc + parseFloat(e.amount), 0) || 0;
 
     const formattedDate = new Date(item.date).toLocaleDateString();
 

@@ -1,7 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { DATABASE_CONNECTION } from '../core/database/database.module';
 import { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
-import * as schema from 'finwealth-infra/src/schema';
+import * as schema from 'finwealth-infra';
 import { and, eq, gte, lt, sql, sum } from 'drizzle-orm';
 import { CreateBudgetDto } from './dto/create-budget.dto';
 

@@ -6,7 +6,7 @@ import {
 } from '@nestjs/terminus';
 import { DATABASE_CONNECTION } from '../database/database.module';
 import { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
-import * as schema from 'finwealth-infra/src/schema';
+import * as schema from 'finwealth-infra';
 import { sql } from 'drizzle-orm';
 
 @Injectable()

@@ -2,7 +2,7 @@ import { Module, Global } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
-import * as schema from 'finwealth-infra/src/schema'; // Path as installed via npm link
+import * as schema from 'finwealth-infra'; // Path as installed via npm link
 
 export const DATABASE_CONNECTION = 'DATABASE_CONNECTION';
 

@@ -20,6 +20,7 @@ interface TransactionsState {
   createTransaction: (data: CreateTransaction) => Promise<void>;
   fetchTransactions: (ledgerId: string, isRefresh?: boolean) => Promise<void>;
   fetchNextPage: (ledgerId: string) => Promise<void>;
+  updateTransaction: (id: string, data: Partial<CreateTransaction>) => Promise<void>;
   reset: () => void;
 }
 
@@ -106,7 +107,7 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
     }
   },
 
-  updateTransaction: async (id, data) => {
+  updateTransaction: async (id: string, data: Partial<CreateTransaction>) => {
     set({ isLoading: true, error: null });
     try {
       await TransactionsApi.updateTransaction(id, data);

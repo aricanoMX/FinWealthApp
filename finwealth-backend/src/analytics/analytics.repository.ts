@@ -1,7 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { DATABASE_CONNECTION } from '../core/database/database.module';
 import { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
-import * as schema from 'finwealth-infra/src/schema';
+import * as schema from 'finwealth-infra';
 import { eq, and, lte, gte, sql, inArray, SQL } from 'drizzle-orm';
 import Decimal from 'decimal.js';
 

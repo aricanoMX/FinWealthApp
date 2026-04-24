@@ -4,7 +4,7 @@ import { CreateBudgetDto } from './dto/create-budget.dto';
 import { DATABASE_CONNECTION } from '../core/database/database.module';
 import { Inject } from '@nestjs/common';
 import { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
-import * as schema from 'finwealth-infra/src/schema';
+import * as schema from 'finwealth-infra';
 import { eq, and } from 'drizzle-orm';
 
 @Injectable()
