@@ -106,6 +106,22 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
     }
   },
 
+  updateTransaction: async (id, data) => {
+    set({ isLoading: true, error: null });
+    try {
+      await TransactionsApi.updateTransaction(id, data);
+      set({ isLoading: false });
+      // Reload page 1 to reflect changes
+      await get().fetchTransactions('default-ledger', true);
+    } catch (err: any) {
+      set({
+        error: err.response?.data?.message || err.message || 'Error al actualizar la transacción',
+        isLoading: false,
+      });
+      throw err;
+    }
+  },
+
   reset: () =>
     set({
       suggestions: [],

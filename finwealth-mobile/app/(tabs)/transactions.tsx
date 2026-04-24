@@ -186,9 +186,28 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
+  cardFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
   date: {
     color: theme.colors.textMuted,
     fontSize: 14,
+  },
+  editButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(212, 175, 55, 0.1)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+  },
+  editButtonText: {
+    color: theme.colors.primary,
+    fontSize: 12,
+    marginLeft: 4,
+    fontWeight: '600',
   },
   footerLoader: {
     paddingVertical: theme.spacing[16],

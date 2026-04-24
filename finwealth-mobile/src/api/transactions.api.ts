@@ -80,4 +80,12 @@ export const TransactionsApi = {
     const response = await apiClient.post(`/transactions`, data);
     return response.data.data;
   },
+
+  updateTransaction: async (
+    id: string,
+    data: Partial<CreateTransaction>,
+  ): Promise<{ id: string }> => {
+    const response = await apiClient.patch(`/transactions/${id}`, data);
+    return response.data.data;
+  },
 };
