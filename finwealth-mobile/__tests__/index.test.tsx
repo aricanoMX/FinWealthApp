@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react-native';
-import Home from './index';
+import Home from '../app/index';
 import { useAppStore } from '../src/store/app.store';
 
 describe('<Home />', () => {
